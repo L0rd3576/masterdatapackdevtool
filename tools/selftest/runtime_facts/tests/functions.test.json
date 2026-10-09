@@ -1,0 +1,21 @@
+{
+  "description": "macros, return values, schedule timing",
+  "setup": ["scoreboard players reset * rf.v"],
+  "steps": [
+    {"run": "function rf:set_score {target:\"#m\",value:7}"},
+    {"assert_score": {"target": "#m", "objective": "rf.v", "equals": 7}},
+    {"run": "data modify storage rf:args a set value {target:\"#s\",value:9}"},
+    {"run": "function rf:set_score with storage rf:args a"},
+    {"assert_score": {"target": "#s", "objective": "rf.v", "equals": 9}},
+    {"run": "execute store result score #r rf.v run function rf:add_one_return"},
+    {"assert_score": {"target": "#r", "objective": "rf.v", "equals": 42}},
+    {"assert_score": {"target": "#ret", "objective": "rf.v", "equals": 1}},
+    {"run": "function rf:set_score {target:\"#bad\"}", "allow_error": true},
+    {"assert_output": {"command": "scoreboard players get #bad rf.v", "contains": "Can't get value"}},
+    {"run": "schedule function rf:scheduled 5t"},
+    {"ticks": 4},
+    {"assert": "unless score #sched rf.v matches 1"},
+    {"ticks": 1},
+    {"assert_score": {"target": "#sched", "objective": "rf.v", "equals": 1}}
+  ]
+}

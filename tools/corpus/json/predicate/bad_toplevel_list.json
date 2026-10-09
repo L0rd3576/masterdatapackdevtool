@@ -1,0 +1,1 @@
+[{"type":"minecraft:random_chance","chance":0.5},{"type":"minecraft:time_check","value":{"min":0,"max":12000},"clock":"minecraft:overworld"}]

@@ -1,0 +1,15 @@
+{
+  "description": "load creates objectives; tick counts ticks; reward increments a counter",
+  "setup": [
+    "scoreboard players set #global example.ticks 0",
+    "scoreboard players set #global example.calls 0"
+  ],
+  "steps": [
+    {"assert_data": {"source": "storage example:state", "path": "loaded", "equals": "1b"}},
+    {"ticks": 10},
+    {"assert_score": {"target": "#global", "objective": "example.ticks", "equals": 10}},
+    {"run": "function example:reward"},
+    {"assert_score": {"target": "#global", "objective": "example.calls", "equals": 1}},
+    {"assert": "if score #global example.ticks matches 10"}
+  ]
+}

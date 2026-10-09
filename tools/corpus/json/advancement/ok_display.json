@@ -1,0 +1,1 @@
+{"display":{"icon":{"id":"minecraft:diamond"},"title":{"text":"T"},"description":"D","frame":"goal"},"criteria":{"t":{"trigger":"minecraft:inventory_changed","conditions":{"items":[{"items":"minecraft:diamond"}]}}}}

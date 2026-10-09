@@ -1,0 +1,16 @@
+{
+  "description": "entity NBT shapes in 26.3 (equipment map, text-component CustomName, item entity components)",
+  "setup": ["kill @e[type=!minecraft:player]"],
+  "steps": [
+    {"run": "summon minecraft:armor_stand 0 -60 0 {Tags:[\"rf\"],equipment:{head:{id:\"minecraft:diamond_helmet\",count:1}},CustomName:{text:\"Bob\",color:\"gold\"}}"},
+    {"assert_data": {"source": "entity @n[type=minecraft:armor_stand,tag=rf]", "path": "equipment.head.id", "equals": "\"minecraft:diamond_helmet\""}},
+    {"assert_data": {"source": "entity @n[type=minecraft:armor_stand,tag=rf]", "path": "CustomName", "equals": "{color:\"gold\",text:\"Bob\"}"}},
+    {"run": "summon minecraft:item 2 -60 0 {Tags:[\"rf\"],Item:{id:\"minecraft:stick\",count:3,components:{\"minecraft:custom_data\":{rf:1b}}}}"},
+    {"assert_data": {"source": "entity @n[type=minecraft:item,tag=rf]", "path": "Item.components.\"minecraft:custom_data\".rf", "equals": "1b"}},
+    {"assert": "if items entity @n[type=minecraft:item,tag=rf] contents minecraft:stick[minecraft:custom_data~{rf:1b}]"},
+    {"assert": "unless items entity @n[type=minecraft:item,tag=rf] contents minecraft:stick[minecraft:custom_data~{rf:2b}]"},
+    {"run": "item replace entity @n[type=minecraft:armor_stand,tag=rf] armor.chest with minecraft:iron_chestplate[minecraft:unbreakable={}]"},
+    {"assert_data": {"source": "entity @n[type=minecraft:armor_stand,tag=rf]", "path": "equipment.chest.components", "equals": "{\"minecraft:unbreakable\":{}}"}}
+  ],
+  "teardown": ["kill @e[type=!minecraft:player]"]
+}

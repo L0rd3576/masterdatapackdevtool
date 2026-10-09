@@ -1,0 +1,12 @@
+{
+  "setup": ["scoreboard players set #n t.ticks 0", "kill @e[type=minecraft:marker]", "summon minecraft:marker 0 -60 0 {Tags:[\"t.m\"]}"],
+  "steps": [
+    {"assert": "if block 0 -61 0 minecraft:grass_block"},
+    {"assert": "if block 0 -60 0 minecraft:air"},
+    {"ticks": 5},
+    {"assert_score": {"target": "#n", "objective": "t.ticks", "equals": 5}},
+    {"assert": "if entity @e[type=minecraft:marker,tag=t.m,x=4.5,dx=1,y=-61,dy=2,z=-1,dz=2]", "show": "data get entity @n[type=minecraft:marker] Pos"},
+    {"assert_output": {"command": "data get entity @n[type=minecraft:marker] Pos[0]", "equals": "Marker has the following entity data: 5.5d"}}
+  ],
+  "teardown": ["kill @e[type=minecraft:marker]"]
+}

@@ -1,0 +1,13 @@
+# Large/regenerable artifacts (re-download via the setup steps in CLAUDE.md)
+runtime/
+server/
+generated/
+dl/
+test-server/
+reference/vanilla-data/
+# Run logs and caches
+run-log.jsonl
+run-err.log
+__pycache__/
+*.pyc
+*.log

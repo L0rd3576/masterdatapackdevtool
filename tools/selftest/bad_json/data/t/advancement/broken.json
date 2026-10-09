@@ -1,0 +1,5 @@
+{
+  "criteria": {
+    "x": {"trigger": "minecraft:tick"},
+  }
+}

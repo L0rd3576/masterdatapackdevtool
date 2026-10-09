@@ -1,0 +1,1 @@
+{"pools":[{"rolls":1,"entries":[{"type":"minecraft:item","name":"minecraft:stick","modifier":[{"type":"minecraft:set_components","components":{"minecraft:custom_name":{"text":"Wand","italic":false},"minecraft:custom_data":{"wand":1}}}]}]}]}

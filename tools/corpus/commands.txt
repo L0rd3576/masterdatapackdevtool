@@ -1,0 +1,276 @@
+# Differential corpus: each non-comment line becomes its own function and is judged by BOTH the
+# linter and the 26.3 server (python tools/diff_corpus.py). Lines are intentionally a mix of valid and invalid.
+# Suffix "  ## lint-only" = the server accepts it at load time but it is still a bug (linter must flag it).
+say hello
+tellraw @a {"text":"json text","color":"red"}
+tellraw @a {text:"snbt text",color:"red",bold:true}
+tellraw @a [{text:"a"},{text:"b",italic:true}]
+tellraw @a "plain string"
+tellraw @a {text:"click",click_event:{action:"run_command",command:"/say hi"}}
+tellraw @a {text:"hover",hover_event:{action:"show_text",value:"tip"}}
+tellraw @a {"text":"old","clickEvent":{"action":"run_command","value":"/say hi"}}  ## lint-only
+tellraw @a {text:"old",hoverEvent:{action:"show_text",contents:"tip"}}  ## lint-only
+tellraw @a {text:"score",extra:[{score:{name:"@s",objective:"c.obj"}}]}
+title @a title {text:"Title"}
+title @a times 10 70 20
+title @a actionbar "bar"
+scoreboard objectives add c.obj dummy
+scoreboard objectives add c.obj2 dummy {text:"Display"}
+scoreboard objectives add c.trig trigger
+scoreboard objectives add c.deaths deathCount
+scoreboard objectives add c.mined minecraft.mined:minecraft.stone
+scoreboard objectives add Bad!Name dummy
+scoreboard objectives add c.x not_a_criterion
+scoreboard objectives remove c.obj2
+scoreboard objectives setdisplay sidebar c.obj
+scoreboard objectives modify c.obj displayname {text:"X"}
+scoreboard players set #global c.obj 5
+scoreboard players set @s c.obj 5
+scoreboard players add @a c.obj 1
+scoreboard players remove @a[scores={c.obj=1..}] c.obj 1
+scoreboard players operation #a c.obj += #b c.obj
+scoreboard players operation #a c.obj ><= #b c.obj
+scoreboard players get #a c.obj
+scoreboard players reset * c.obj
+scoreboard players enable @a c.trig
+scoreboard players display name #a c.obj {text:"A"}
+execute as @a at @s run say hi
+execute as @a say hi
+execute as @e[type=minecraft:zombie,limit=3,sort=nearest] at @s run tp @s ~ ~1 ~
+execute as @e[type=zombie] run kill @s
+execute as @e[type=minecraft:not_an_entity] run kill @s
+execute as @e[tag=c.tag,distance=..5] run tag @s add c.other
+execute as @e[nbt={OnGround:1b}] run say grounded
+execute as @e[predicate=c:is_sneaking] run say sneaking
+execute as @e[predicate=c:missing_predicate] run say x  ## lint-only
+execute as @e[colour=red] run say x
+execute if score #a c.obj matches 1..5 run say in range
+execute if score #a c.obj > #b c.obj run say greater
+execute unless entity @e[type=minecraft:pig] run say no pigs
+execute if block ~ ~-1 ~ minecraft:grass_block run say grass
+execute if block ~ ~-1 ~ #minecraft:logs run say log
+execute if block ~ ~ ~ minecraft:oak_stairs[facing=north,half=top] run say stairs
+execute if block ~ ~ ~ minecraft:oak_stairs[facing=up] run say bad
+execute if blocks ~ ~ ~ ~1 ~1 ~1 0 0 0 all run say same
+execute if data storage c:s value run say has
+execute if predicate c:is_sneaking run say pred
+execute if function c:helper run say ok
+execute if items entity @s weapon.mainhand minecraft:diamond_sword run say sword
+execute if items entity @s container.* #minecraft:swords run say any sword
+execute if items entity @s weapon.mainhand *[minecraft:custom_data~{c:{id:1}}] run say tagged
+execute if dimension minecraft:the_nether run say nether
+execute if loaded 0 0 0 run say loaded
+execute if biome ~ ~ ~ minecraft:plains run say plains
+execute store result score #a c.obj run data get storage c:s value
+execute store result storage c:s value int 1 run scoreboard players get #a c.obj
+execute store success score #a c.obj if entity @a
+execute store result entity @s Health float 1 run say x
+execute positioned 0 64 0 run say pos
+execute positioned as @s run say pos
+execute positioned over world_surface run say surface
+execute rotated as @s run say rot
+execute facing entity @p eyes run say face
+execute anchored eyes positioned ^ ^ ^1 run say front
+execute align xyz run say align
+execute align xzy run say align
+execute in minecraft:the_end run say end
+execute on passengers run say rider
+execute on attacker run say attacker
+execute summon minecraft:marker run tag @s add c.m
+execute if entity @s
+execute run
+execute if score #a c.obj matches 1.. run return 1
+return 5
+return fail
+return run scoreboard players get #a c.obj
+function c:helper
+function c:helper2  ## lint-only
+function #c:mytag
+function c:macro {name:"x"}
+function c:macro with storage c:s args
+schedule function c:helper 20t
+schedule function c:helper 1s append
+schedule clear c:helper
+data modify storage c:s value set value 5
+data modify storage c:s list append value {id:1}
+data modify storage c:s a.b[0].c set from entity @s Pos[1]
+data modify entity @s CustomName set value {text:"Name"}
+data merge storage c:s {a:1,b:[1,2,3],c:"str",d:1.5f}
+data remove storage c:s value
+data get entity @s SelectedItem
+give @s minecraft:diamond 64
+give @s diamond
+give @s minecraft:diamond_sword[minecraft:damage=5]
+give @s minecraft:diamond_sword{Damage:5}
+give @s minecraft:diamond_sword[damage=5,unbreakable={}]
+give @s minecraft:stick[custom_name={text:"Wand",italic:false},lore=[{text:"line"}]]
+give @s minecraft:stick[custom_data={c:{wand:1b}}]
+give @s minecraft:stick[enchantment_glint_override=true,max_stack_size=1]
+give @s minecraft:diamond_sword[enchantments={"minecraft:sharpness":5}]
+give @s minecraft:diamond_sword[enchantments={levels:{"minecraft:sharpness":5}}]
+give @s minecraft:potion[potion_contents={potion:"minecraft:swiftness"}]
+give @s minecraft:stick[not_a_component=1]
+give @s minecraft:stick[!food]
+give @s minecraft:not_an_item
+give @s minecraft:player_head[profile={name:"Notch"}]
+give @s minecraft:leather_helmet[dyed_color=16711680]
+give @s minecraft:stick[item_model="minecraft:blaze_rod"]
+give @s minecraft:stick[tooltip_display={hidden_components:["minecraft:enchantments"]}]
+give @s minecraft:stick[attribute_modifiers=[{type:"minecraft:attack_damage",amount:5,id:"c:dmg",operation:"add_value",slot:"mainhand"}]]
+give @s minecraft:stick[minecraft:food={nutrition:4,saturation:0.5f}]
+give @s minecraft:stick[consumable={consume_seconds:1.6f}]
+item replace entity @s weapon.mainhand with minecraft:stick
+item replace entity @s armor.head with minecraft:diamond_helmet 1
+item replace block ~ ~ ~ container.0 with minecraft:stone
+item modify entity @s weapon.mainhand c:my_modifier
+clear @s minecraft:stick 1
+clear @s *[custom_data~{c:{wand:1b}}]
+summon minecraft:zombie ~ ~ ~
+summon minecraft:zombie ~ ~ ~ {NoAI:1b,Tags:["c.z"],CustomName:{text:"Bob"}}
+summon minecraft:item ~ ~ ~ {Item:{id:"minecraft:diamond",count:1}}
+summon minecraft:armor_stand ~ ~ ~ {equipment:{head:{id:"minecraft:diamond_helmet",count:1}}}
+summon zombie ^ ^ ^1
+summon minecraft:zombie ~ ^ ~
+summon minecraft:not_a_mob ~ ~ ~
+kill @e[type=minecraft:item]
+tp @s 0 100 0
+tp @s ~ ~ ~ 90 0
+teleport @s ^ ^ ^1
+tp @e[type=minecraft:pig] @p
+setblock ~ ~ ~ minecraft:stone
+setblock ~ ~ ~ minecraft:chest[facing=east]{Items:[]} replace
+setblock 0 0 0.5 minecraft:stone
+setblock ~ ~ ~ minecraft:not_a_block
+fill ~-1 ~ ~-1 ~1 ~ ~1 minecraft:air replace minecraft:stone
+fill ~ ~ ~ ~ ~ ~ minecraft:glass hollow
+clone 0 0 0 1 1 1 5 5 5 masked
+effect give @s minecraft:speed 30 1 true
+effect give @s minecraft:speed infinite 0
+effect give @s speed 10
+effect give @s minecraft:speedy 10
+effect clear @s
+enchant @s minecraft:sharpness 2
+attribute @s minecraft:max_health base set 40
+attribute @s minecraft:generic.max_health base set 40
+attribute @s minecraft:movement_speed modifier add c:fast 0.1 add_multiplied_base
+attribute @s minecraft:scale base get
+particle minecraft:flame ~ ~1 ~ 0.1 0.1 0.1 0.01 10 force
+particle minecraft:dust{color:[1.0,0.0,0.0],scale:1.0} ~ ~1 ~ 0 0 0 0 1
+particle minecraft:dust 1.0 0.0 0.0 1.0 ~ ~ ~
+playsound minecraft:entity.experience_orb.pickup master @a ~ ~ ~ 1 1
+playsound minecraft:block.note_block.pling player @s
+stopsound @a master
+bossbar add c:bar {text:"Boss"}
+bossbar set c:bar max 100
+bossbar set c:bar players @a
+bossbar set c:bar color red
+team add c.red
+team modify c.red color red
+team join c.red @s
+tag @s add c.t
+tag @s remove c.t
+damage @s 5 minecraft:magic
+damage @s 2 minecraft:arrow by @p
+random value 1..6
+random roll 1..100
+time set day
+time add 100
+time query gametime
+weather clear
+gamerule spawn_mobs false
+gamerule keep_inventory true
+gamerule doDaylightCycle false
+gamerule keepInventory true
+difficulty peaceful
+tick freeze
+tick step 10
+forceload add 0 0
+spreadplayers 0 0 5 20 false @a
+ride @s mount @e[type=minecraft:horse,limit=1]
+ride @s dismount
+rotate @s 90 0
+rotate @s facing entity @p
+loot give @s loot minecraft:chests/simple_dungeon
+loot spawn ~ ~ ~ loot c:my_loot
+loot give @s loot c:no_such_loot  ## lint-only
+place feature minecraft:oak ~ ~ ~
+place structure minecraft:village_plains ~ ~ ~
+advancement grant @s only minecraft:story/root
+advancement grant @s only c:no_such_adv  ## lint-only
+recipe give @s minecraft:diamond_sword
+experience add @s 10 levels
+xp set @s 0 points
+spawnpoint @s ~ ~ ~
+setworldspawn 0 64 0
+worldborder set 100
+locate structure minecraft:village_plains
+locate biome minecraft:plains
+trigger c.trig set 1
+msg @a hello
+w @a hi
+me waves
+op someone
+stop
+reload
+datapack list
+kill @s
+$say $(name)
+$scoreboard players set $(player) c.obj $(value)
+$give @s $(item)
+$tp @s $(x) $(y) $(z)
+$execute if score @s c.obj matches $(min).. run say ok
+$say $(bad name)
+say no macro $(here)
+/say slash
+# --- 26.3 additions (context providers / slot sources are only shallowly checked by the linter) ---
+compute default integer 5  ## server-only
+compute default integer {type:"minecraft:uniform",min:1,max:6}  ## server-only
+compute default float 2.5  ## server-only
+compute default float {type:"minecraft:uniform",min:0.0,max:1.0} 100  ## server-only
+compute default integer {type:"minecraft:sum",summands:[1,2]}  ## server-only
+compute default integer {type:"minecraft:add",left:1,right:2}  ## server-only
+compute entity @s float {type:"minecraft:storage",storage:"c:s",path:"v"}  ## server-only
+execute store result score #r c.obj run compute default integer {type:"minecraft:uniform",min:1,max:6}  ## server-only
+data modify storage c:s v set compute default integer 7  ## server-only
+item fill entity @s container.* with minecraft:stone  ## server-only
+item replace entity @s hotbar.0 with minecraft:stone  ## server-only
+item replace entity @s villager.0 with minecraft:stone  ## server-only
+item replace entity @s mob.inventory.0 with minecraft:stone  ## server-only
+item replace entity @s weapon.* with minecraft:stone  ## server-only
+item replace entity @s not_a_slot with minecraft:stone  ## server-only
+execute if slots entity @s container.*  ## server-only
+execute if items entity @s armor.* minecraft:diamond_helmet run say helmet  ## server-only
+swing @s mainhand stab 10t
+swing @s offhand whack
+swing @s mainhand bonk
+stopwatch create c:sw
+stopwatch query c:sw 20
+time of minecraft:overworld set minecraft:day
+time set noon
+time of minecraft:overworld query time
+dialog show @a minecraft:server_links
+waypoint list
+fetchprofile name Notch
+posteffect add @a minecraft:invert
+summon minecraft:text_display ~ ~ ~ {text:{text:"Hi",color:"gold"},billboard:"center"}
+summon minecraft:item_display ~ ~ ~ {item:{id:"minecraft:diamond",count:1},transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[1f,1f,1f]}}
+execute summon minecraft:interaction run data merge entity @s {width:1f,height:1f}
+data modify entity @s equipment.mainhand set value {id:"minecraft:stick",count:1}
+item replace entity @s armor.body with minecraft:diamond_horse_armor
+execute as @e[type=#minecraft:skeletons] run say bones
+execute as @e[type=!minecraft:player,distance=..10] run say not player
+kill @e[type=minecraft:marker,tag=!keep,limit=5,sort=furthest]
+execute as @a[gamemode=!spectator,level=10..,x_rotation=-90..0] run say ok
+execute as @a[advancements={minecraft:story/root=true}] run say adv
+execute as @a[scores={c.obj=..0,c.trig=1}] run say scores
+execute if entity @a[name="Steve"]
+scoreboard players set Steve c.obj 1
+scoreboard players set @e[type=minecraft:zombie] c.obj 1
+tp @e[limit=2] 0 0 0
+tp @s @e[type=minecraft:pig]
+compute default integer {type:"minecraft:constant",value:5}  ## server-only
+compute default float {type:"minecraft:constant",value:2.5}  ## server-only
+compute default integer {type:"minecraft:add",inputs:[1,2]}  ## server-only
+summon minecraft:zombie ~ ~ ~ {CustomName:"\"Bob\""}
+give @e minecraft:stone
+effect give @e[type=minecraft:pig] minecraft:speed 5
