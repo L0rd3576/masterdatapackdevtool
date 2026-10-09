@@ -41,8 +41,10 @@ server probes (2026-10-09), `tools/corpus/json/*` results in `generated/corpus-r
 - Tag folders: `tags/<registry>` for every registry with `tags: true` (block, item, entity_type, fluid, game_event,
   damage_type, enchantment, function, worldgen/biome, ...).
 - Missing required entry in a **function** tag: `ERROR Couldn't load tag minecraft:load as it is missing following
-  references: t:also_missing` - the server still starts, the tag is dropped (so *none* of its functions run).
-- Missing entry in an **item** tag: same message, tag dropped (verified with `tags/item/bad_ref.json`).
+  references: probe:doesnotexist` - the server still starts, but the whole tag is dropped: the valid
+  `probe:good` in the same load tag did not run either (probe).
+- Missing entry in an **item** tag: same `Couldn't load tag ... missing following references` error
+  (`tags/item/bad_ref.json`). Use `{"id": "...", "required": false}` for optional entries.
 
 ## Load behavior (verified by probes)
 - Element JSON errors (advancement, loot_table, recipe, predicate, item_modifier, ...) abort server start:
