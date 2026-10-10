@@ -11,3 +11,5 @@ run-err.log
 __pycache__/
 *.pyc
 *.log
+chain-status.json
+chain-logs/

@@ -18,6 +18,10 @@ Never state an unverified syntax as fact. If you cannot verify it, say so and lo
 | `python tools/diff_corpus.py` | Linter vs. real server on `tools/corpus/` (use when adding linter rules) |
 | `python tools/selftest.py [--fast]` | Proves the harness: good packs pass, broken packs fail, 0 lint errors on all vanilla data |
 | `python tools/verify_knowledge.py` | Re-checks knowledge/ claims against the generated reports |
+| `python tools/new_project.py <ns> <dir> [--lib-prefix p]` | New pack from the template with the function library vendored (`--update <dir>` re-vendors) |
+| `python tools/test_library.py` | Whole library suite: header/INDEX check, lint, server tests |
+| `python tools/gen_library_index.py` | Regenerate `library/INDEX.md` from function headers (fails on a missing header) |
+| `python tools/probe.py [--pack D] cmd...` | Research: boot a server, print raw responses to commands |
 Test file format and test-world facts: `knowledge/testing.md`. A server boot takes about 7 s.
 
 ## Workflow for every task (mandatory)
@@ -27,6 +31,14 @@ Test file format and test-world facts: `knowledge/testing.md`. A server boot tak
 4. Run `python tools/lint_datapack.py <project>` after every edit. Fix all ERRORs; read WARNs.
 5. Add or update a test in `<project>/tests/` for new behavior, then run `python tools/run_tests.py <project>` before saying work is done.
 6. Report what changed and what was verified, with real output. Never claim success without it.
+
+## Function library (reuse before writing)
+- `library/mcdp_lib/` is a tested library pack (110 public functions: score/math, timer, random, list, player, team,
+  msg, item, world, rules, flow, fsm, debug). Before writing any helper function, search `library/INDEX.md`; call the
+  library instead of re-writing command sequences. New packs: `tools/new_project.py` (vendors it).
+- Missing something reusable? Add it to the library (header `#> mcdp_lib:<path>` + Purpose/Inputs/Outputs/Effects/
+  Context/Cost/Example, a test in `library/mcdp_lib/tests/`), then `tools/gen_library_index.py` and
+  `tools/test_library.py`. Procedure and conventions: skill `function-library`; macro rules: `knowledge/function-macros.md`.
 
 ## Ground truth layout
 - `server/server.jar` (26.3, sha1 33680f5f...), `runtime/jre25/` (Temurin 25), `generated/` (data generator output, `--all`).
@@ -56,6 +68,8 @@ This is how you get better over time; nothing is retrained, so the learning live
 - `knowledge/pack-format.md` pack.mcmeta, format 121, what the server does with old forms
 - `knowledge/datapack-structure.md` folders (singular), namespaces, tags, load behavior, silent ignores
 - `knowledge/functions.md` mcfunction syntax, macros, return, schedule, permission level, function tags
+- `knowledge/function-macros.md` macro substitution/call/failure rules, return, context, limits, performance (tested)
+- `library/INDEX.md` reusable function index; `library/mcdp_lib/` the library pack + tests
 - `knowledge/commands.md` server-verified command forms, renamed gamerules, new 26.x commands (`/compute`, slot sources)
 - `knowledge/item-components.md` `id[component=value]`, item predicates, item NBT shape, component list
 - `knowledge/text-components.md` SNBT text, click_event/hover_event, selectors, SNBT, NBT paths, coordinates

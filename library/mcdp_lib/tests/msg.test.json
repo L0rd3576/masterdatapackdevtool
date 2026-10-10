@@ -1,0 +1,32 @@
+{
+  "description": "msg/*: tell/broadcast/title/actionbar parse with stored text (no players on the server: 0 reached); countdown timing, display value, callback, cancel",
+  "setup": ["scoreboard objectives add mcdp_lib_t dummy", "scoreboard players reset * mcdp_lib_t"],
+  "steps": [
+    {"run": "data modify storage mcdp_lib:in text set value {text:\"hi\",color:\"gold\"}"},
+    {"run": "data modify storage mcdp_lib:in title set value {text:\"Title\"}"},
+    {"run": "data modify storage mcdp_lib:in subtitle set value {text:\"Sub\"}"},
+    {"run": "execute store result score #n mcdp_lib_t run function mcdp_lib:msg/tell {targets:\"@a\"}"},
+    {"assert_score": {"target": "#n", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "function mcdp_lib:msg/broadcast"},
+    {"run": "function mcdp_lib:msg/title {targets:\"@a\",fade_in:1,stay:2,fade_out:3}"},
+    {"run": "function mcdp_lib:msg/actionbar {targets:\"@a[tag=x]\"}"},
+    {"run": "function mcdp_lib:msg/countdown {name:\"t1\",seconds:2,targets:\"@a\",display:\"actionbar\",label:\"Go in \",callback:\"mcdp_lib_test:cb\"}"},
+    {"ticks": 1},
+    {"assert_score": {"target": "#cd.t1", "objective": "mcdp_lib.var", "equals": 2}},
+    {"ticks": 20},
+    {"assert_score": {"target": "#cd.t1", "objective": "mcdp_lib.var", "equals": 1}},
+    {"ticks": 18},
+    {"assert": "unless score #cb mcdp_lib_t matches 1.."},
+    {"ticks": 1},
+    {"assert_score": {"target": "#cb", "objective": "mcdp_lib_t", "equals": 1}},
+    {"assert_data": {"source": "storage mcdp_lib:internal", "path": "countdowns", "equals": "[]"}},
+    {"run": "function mcdp_lib:msg/countdown {name:\"t2\",seconds:1,targets:\"@a\",display:\"title\",label:\"\",callback:\"mcdp_lib_test:cb\"}"},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:msg/countdown_cancel {name:\"t2\"}"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 1}},
+    {"ticks": 25},
+    {"assert_score": {"target": "#cb", "objective": "mcdp_lib_t", "equals": 1}},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:msg/countdown_cancel {name:\"t2\"}"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "function mcdp_lib:msg/countdown {name:\"t3\",seconds:1}", "expect_error": "Missing argument"}
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "description": "How macro arguments are turned into text (26.3 runtime evidence for knowledge/function-macros.md)",
+  "steps": [
+    {"run": "function mf:show {x:1b}"},   {"assert_data": {"source": "storage mf:o", "path": "s", "equals": "\"1\""}},
+    {"run": "function mf:show {x:7L}"},   {"assert_data": {"source": "storage mf:o", "path": "s", "equals": "\"7\""}},
+    {"run": "function mf:show {x:1.5f}"}, {"assert_data": {"source": "storage mf:o", "path": "s", "equals": "\"1.5\""}},
+    {"run": "function mf:show {x:true}"}, {"assert_data": {"source": "storage mf:o", "path": "s", "equals": "\"1\""}},
+    {"run": "function mf:show {x:\"a b\"}"}, {"assert_data": {"source": "storage mf:o", "path": "s", "equals": "\"a b\""}},
+    {"run": "function mf:show_raw {x:1.5f}"}, {"assert_data": {"source": "storage mf:o", "path": "raw", "equals": "1.5d"}},
+    {"run": "function mf:show_raw {x:{a:1,b:\"x y\",c:[1,2]}}"},
+    {"assert_data": {"source": "storage mf:o", "path": "raw", "equals": "{a:1,b:\"x y\",c:[1,2]}"}},
+    {"run": "function mf:show_raw {x:[I;1,2]}"}, {"assert_data": {"source": "storage mf:o", "path": "raw", "equals": "[I;1,2]"}},
+    {"run": "function mf:show_raw {x:12345678.9d}"}, {"assert_data": {"source": "storage mf:o", "path": "raw", "equals": "1.23456789E7d"}},
+    {"run": "function mf:show_raw {x:\"two words\"}", "expect_error": "Failed to instantiate function mf:show_raw"},
+    {"run": "function mf:show {x:'say \"hi\"'}", "expect_error": "Expected whitespace"},
+    {"run": "function mf:show_raw {x:1e10d}", "expect_error": "Failed to instantiate"}
+  ]
+}

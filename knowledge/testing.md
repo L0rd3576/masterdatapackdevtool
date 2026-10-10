@@ -24,8 +24,13 @@ Options: `--keep` (keep `test-server/runs/run-*`), `--skip-lint`, `--only <subst
 ```
 - `assert` runs `execute <condition>`; passes if the response starts with `Test passed`.
 - `assert_data` compares the SNBT after `...data: ` ignoring whitespace outside strings (server prints `{a: 1}`).
+- `{"run": cmd, "expect_error": "Missing argument"}` passes only if the command errors AND the response contains
+  the text (expected-failure tests, e.g. a macro called without a key).
+- `{"assert_log": "text"}` passes if a server log line written since the test started contains the text
+  (e.g. output of `say`).
 - A `run` step fails if the response is a parse error (`<--[HERE]`, `Unknown or incomplete command`,
-  `Unknown function`, `Incorrect argument`, ...). Runtime failures like "No entity was found" are not errors:
+  `Unknown function`, `Incorrect argument`, `Failed to instantiate function` (macro), ...).
+  Macro failures inside a nested call are silent (no response, no log): call library functions top-level in tests. Runtime failures like "No entity was found" are not errors:
   assert on the effect instead.
 - After each test, new ERROR/WARN lines in the server log fail the test.
 - Steps run from the server console (RCON): no `@s`; use `execute as ... run`. Max 1446 bytes per command.

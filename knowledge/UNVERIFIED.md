@@ -32,3 +32,11 @@ one, verify it (copy a vanilla file, add a corpus line to `tools/corpus/commands
 ## Behaviour
 - `@s` context of tick/load functions and `execute as` without `at` (standard behaviour, not re-tested).
 - Load order across multiple packs and `/reload` re-running `#minecraft:load` (not tested this session).
+
+## Function library parts that need a real player (test server has none) - added 2026-10-09
+- `mcdp_lib:player/restore_gamemode` / `rules` gamemode: `playerGameType` read + `gamemode <mode> @s` untested at runtime.
+- `mcdp_lib:player/save_inventory`/`restore_inventory` for players: assumes player NBT `Inventory` (Slot 0-35) +
+  `equipment` (26.x), restores Slot 0-8 -> `hotbar.N`, 9-35 -> `inventory.N-9`. Only the equipment path is tested (armor stand).
+- `rules` `block_break:0b`: attribute modifier `block_break_speed` x0 should stop survival/adventure breaking; untested.
+  Whether command-added attribute modifiers survive player death is unknown (re-apply with `rules/apply_self`).
+- `item/give*`, `item/clear*`, `msg/*` delivery: only verified to parse/run with zero players (return 0).

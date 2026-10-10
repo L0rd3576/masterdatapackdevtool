@@ -28,7 +28,7 @@ Functions run at `function-permission-level` (default 2 = "gamemasters"). Comman
 (server: `Unknown or incomplete command ... at position 0`). Check with:
 `python -c "import json;c=json.load(open('generated/reports/commands.json'))['children'];print([k for k,v in c.items() if v.get('permissions',{}).get('permission',{}).get('level') in ('admins','owners')])"`
 
-## Macros (verified at runtime)
+## Macros (verified at runtime; full rules, failure modes and performance: function-macros.md)
 ```mcfunction
 # data/rf/function/set_score.mcfunction
 $scoreboard players set $(target) rf.v $(value)

@@ -8,4 +8,6 @@ New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\rules" | Out-Null
 Copy-Item "C:\Users\lrafy\mc-datapack-tools\install\minecraft-datapacks.md" "$env:USERPROFILE\.claude\rules\"
 New-Item -ItemType Directory -Force "C:\Users\lrafy\mc-datapack-tools\.claude\skills\datapack-workflow" | Out-Null
 Copy-Item "C:\Users\lrafy\mc-datapack-tools\install\skills\datapack-workflow\SKILL.md" "C:\Users\lrafy\mc-datapack-tools\.claude\skills\datapack-workflow\"
+New-Item -ItemType Directory -Force "C:\Users\lrafy\mc-datapack-tools\.claude\skills\function-library" | Out-Null
+Copy-Item "C:\Users\lrafy\mc-datapack-tools\install\skills\function-library\SKILL.md" "C:\Users\lrafy\mc-datapack-tools\.claude\skills\function-library\"
 ```

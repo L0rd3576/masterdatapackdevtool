@@ -1,0 +1,25 @@
+{
+  "description": "math/* scoreboard fast paths: clamp, min, max, floor div, mod, abs, divide-by-zero",
+  "setup": ["scoreboard objectives add mcdp_lib_t dummy"],
+  "steps": [
+    {"run": "scoreboard players set #value mcdp_lib.in 50"}, {"run": "scoreboard players set #min mcdp_lib.in 0"},
+    {"run": "scoreboard players set #max mcdp_lib.in 20"},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:math/clamp"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 20}},
+    {"run": "scoreboard players set #value mcdp_lib.in -5"}, {"run": "function mcdp_lib:math/clamp"},
+    {"assert_score": {"target": "#result", "objective": "mcdp_lib.out", "equals": 0}},
+    {"run": "scoreboard players set #a mcdp_lib.in -7"}, {"run": "scoreboard players set #b mcdp_lib.in 2"},
+    {"run": "function mcdp_lib:math/min"}, {"assert_score": {"target": "#result", "objective": "mcdp_lib.out", "equals": -7}},
+    {"run": "function mcdp_lib:math/max"}, {"assert_score": {"target": "#result", "objective": "mcdp_lib.out", "equals": 2}},
+    {"run": "function mcdp_lib:math/div"}, {"assert_score": {"target": "#result", "objective": "mcdp_lib.out", "equals": -4}},
+    {"run": "function mcdp_lib:math/mod"}, {"assert_score": {"target": "#result", "objective": "mcdp_lib.out", "equals": 1}},
+    {"run": "scoreboard players set #b mcdp_lib.in 0"},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:math/div"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 0}},
+    {"assert_score": {"target": "#result", "objective": "mcdp_lib.out", "equals": 0}},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:math/mod"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "scoreboard players set #value mcdp_lib.in -9"}, {"run": "function mcdp_lib:math/abs"},
+    {"assert_score": {"target": "#result", "objective": "mcdp_lib.out", "equals": 9}}
+  ]
+}

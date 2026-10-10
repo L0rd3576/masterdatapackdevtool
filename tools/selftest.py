@@ -20,6 +20,9 @@ CASES = {
     os.path.join(PACKS, "missing_function"): (False, False, "function tag/ call to missing function"),
     os.path.join(PACKS, "failing_assert"): (True, False, "valid pack, wrong expectation -> expected/actual shown"),
     os.path.join(PACKS, "old_layout"): (False, False, "functions/ + tags/functions/ + pack_format only"),
+    os.path.join(PACKS, "macro_facts"): (True, True, "macro substitution/call/return/context evidence"),
+    os.path.join(PACKS, "bad_macro_call"): (False, False, "macro function called without a required key"),
+    os.path.join(ROOT, "library", "mcdp_lib"): (True, True, "function library suite (library/INDEX.md)"),
 }
 
 
@@ -46,6 +49,9 @@ def main(argv):
     code, out = run([os.path.join(ROOT, "tools", "lint_datapack.py"), vanilla_pack(), "--quiet"])
     bad += code != 0
     print(f"[{'ok ' if code == 0 else 'BAD'}] lint      vanilla data (all files) expected PASS  | {out.strip().splitlines()[-1]}")
+    code, out = run([os.path.join(ROOT, "tools", "gen_library_index.py"), "--check"])
+    bad += code != 0
+    print(f"[{'ok ' if code == 0 else 'BAD'}] index     library headers + INDEX.md up to date | {out.strip().splitlines()[-1]}")
     for pack, (lint_ok, tests_ok, why) in CASES.items():
         name = os.path.basename(pack)
         code, out = run([os.path.join(ROOT, "tools", "lint_datapack.py"), pack])

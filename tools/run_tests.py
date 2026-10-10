@@ -59,7 +59,9 @@ NOISE = [
 # RCON responses that mean the command itself did not parse / resolve.
 PARSE_ERROR = re.compile(
     r"<--\[HERE\]|^Unknown or incomplete command|^Incorrect argument|^Unknown function|"
-    r"^Expected |^Invalid |^Can't find element|^Unknown (block|item|entity|effect|objective)"
+    r"^Expected |^Invalid |^Can't find element|^Unknown (block|item|entity|effect|objective)|"
+    # macro calls: missing key / bad substituted line / `with` source not a compound (verified 26.3)
+    r"Failed to instantiate function|^Found no elements matching"
 )
 
 
@@ -295,7 +297,12 @@ def run_cmd(server, command, allow_error=False):
 
 
 def run_step(server, step):
-    if "run" in step:
+    if "run" in step and "expect_error" in step:
+        out = run_cmd(server, step["run"], allow_error=True)
+        if not PARSE_ERROR.search(out) or step["expect_error"] not in out:
+            raise TestFailure(f"{step['run']}\n      expected an error containing: {step['expect_error']!r}\n"
+                              f"      actual: {out!r}")
+    elif "run" in step:
         out = run_cmd(server, step["run"], step.get("allow_error", False))
         if "expect_contains" in step and step["expect_contains"] not in out:
             raise TestFailure(f"{step['run']}\n      expected output containing: {step['expect_contains']!r}\n      actual: {out!r}")
@@ -336,6 +343,10 @@ def run_step(server, step):
             raise TestFailure(f"assert_output {a['command']}: expected to contain {a['contains']!r}, actual {out!r}")
         if "matches" in a and not re.search(a["matches"], out):
             raise TestFailure(f"assert_output {a['command']}: expected to match /{a['matches']}/, actual {out!r}")
+    elif "assert_log" in step:
+        time.sleep(0.1)
+        if not any(step["assert_log"] in l for l in server.log_since(getattr(server, "test_mark", 0))):
+            raise TestFailure(f"assert_log: no server log line since the test started contains {step['assert_log']!r}")
     else:
         raise TestFailure(f"unknown step type: {step}")
 
@@ -343,7 +354,7 @@ def run_step(server, step):
 def run_test(server, path):
     with open(path, encoding="utf-8") as f:
         spec = json.load(f)
-    log_mark = len(server.log_since(0))
+    log_mark = server.test_mark = len(server.log_since(0))
     try:
         for c in spec.get("setup", []):
             run_cmd(server, c)

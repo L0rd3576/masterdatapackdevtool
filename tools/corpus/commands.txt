@@ -274,3 +274,9 @@ compute default integer {type:"minecraft:add",inputs:[1,2]}  ## server-only
 summon minecraft:zombie ~ ~ ~ {CustomName:"\"Bob\""}
 give @e minecraft:stone
 effect give @e[type=minecraft:pig] minecraft:speed 5
+# --- function library session 2026-10-09 ---
+execute if data storage c:s fe[-1]{c:1b} run say x
+execute if data storage c:s fe[0]{c:1b} run say x
+execute if data storage c:s fe[-1].c run say x
+execute if data storage c:s fe[{c:1b}] run say x
+execute store success storage c:s fe[-1].c byte 1 if data storage c:s x

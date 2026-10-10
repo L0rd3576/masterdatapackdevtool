@@ -1,0 +1,25 @@
+{
+  "description": "debug/*: level filtering, last message, console sink via say, watch toggle",
+  "setup": ["scoreboard objectives add mcdp_lib_t dummy", "kill @e[type=minecraft:marker]", "summon minecraft:marker 0 -60 0 {Tags:[\"t.d\"]}"],
+  "steps": [
+    {"run": "function mcdp_lib:debug/set_level {level:2}"},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:debug/info {msg:\"hidden\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:debug/warn {msg:\"shown warn\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 1}},
+    {"assert_data": {"source": "storage mcdp_lib:out", "path": "debug.last", "equals": "\"shown warn\""}},
+    {"run": "data modify storage mcdp_lib:config debug_console set value 1b"},
+    {"run": "function mcdp_lib:debug/error {msg:\"console line 42\"}"},
+    {"assert_log": "console line 42"},
+    {"run": "data modify storage mcdp_lib:config debug_console set value 0b"},
+    {"run": "function mcdp_lib:debug/trace {msg:\"too verbose\"}"},
+    {"assert_data": {"source": "storage mcdp_lib:out", "path": "debug.last", "equals": "\"console line 42\""}},
+    {"run": "execute as @n[type=minecraft:marker,tag=t.d] store result score #r mcdp_lib_t run function mcdp_lib:debug/watch"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 1}},
+    {"run": "execute as @n[type=minecraft:marker,tag=t.d] store result score #r mcdp_lib_t run function mcdp_lib:debug/watch"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "function mcdp_lib:debug/set_level {level:0}"},
+    {"run": "function mcdp_lib:debug/log {level:1}", "expect_error": "Missing argument msg"}
+  ],
+  "teardown": ["kill @e[type=minecraft:marker]"]
+}

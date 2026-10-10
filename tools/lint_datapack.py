@@ -154,6 +154,8 @@ class Pack:
         self.files = []
         self.objectives_created = set()
         self.macro_functions = set()
+        self.macro_args = {}  # function id -> set of $(names) it needs
+        self.calls = []       # (loc, called id, args text or None)
 
 
 class Linter:
@@ -549,13 +551,102 @@ class Linter:
                 if any(not re.fullmatch(r"[A-Za-z0-9_]+", n) for n in names) or re.search(r"\$\((?![A-Za-z0-9_]+\))", body):
                     self.err(loc, "bad macro substitution: use $(name) with name of letters, digits, _ ")
                     continue
+                self.pack.macro_args.setdefault(rid, set()).update(names)
                 line = re.sub(r"\$\([A-Za-z0-9_]+\)", MACRO, body)
             elif re.search(r"\$\([A-Za-z0-9_]+\)", line):
                 self.warn(loc, "contains $(name) but the line does not start with '$', so it is NOT substituted")
+            self.record_calls(loc, line)
             CommandParser(self, loc).parse_command(line)
 
+    CALL = re.compile(r"(?:^|\brun |\bif |\bunless |\bschedule )function ([a-z0-9_.\-]+:[a-z0-9_.\-/]+)(?: (.*))?$")
+
+    def record_calls(self, loc, line):
+        m = self.CALL.search(line)
+        if not m:
+            return
+        rest = (m.group(2) or "").strip()
+        before = line[:m.start()] + line[m.start():m.start(1)]
+        if re.search(r"\b(if|unless|schedule) function $", before):
+            rest = ""  # these forms cannot pass macro arguments
+        if rest.startswith("with "):
+            rest = "with"
+        elif not rest.startswith("{"):
+            rest = None
+        self.pack.calls.append((loc, norm_id(m.group(1)), rest))
+
+    @staticmethod
+    def compound_keys(text):
+        """Top-level keys of an SNBT compound literal, or None if it cannot be read statically."""
+        if MACRO in text:
+            text = text.replace(MACRO, "0")
+        keys, depth, i, quote, expect_key = set(), 0, 0, None, False
+        while i < len(text):
+            c = text[i]
+            if quote:
+                if c == "\\":
+                    i += 1
+                elif c == quote:
+                    quote = None
+            elif c in "\"'":
+                if depth == 1 and expect_key:
+                    j = text.find(c, i + 1)
+                    keys.add(text[i + 1:j])
+                    expect_key = False
+                    i = j
+                else:
+                    quote = c
+            elif c in "{[":
+                depth += 1
+                expect_key = depth == 1 and c == "{"
+            elif c in "}]":
+                depth -= 1
+                if depth == 0:
+                    return keys
+            elif c == "," and depth == 1:
+                expect_key = True
+            elif depth == 1 and expect_key and not c.isspace():
+                m = re.match(r"[A-Za-z0-9_\-.+]+", text[i:])
+                if not m:
+                    return None
+                keys.add(m.group(0))
+                expect_key = False
+                i += len(m.group(0)) - 1
+            i += 1
+        return None
+
     def post_checks(self):
-        pass
+        # Macro functions fail at runtime with "Missing argument" (silently when nested): check calls statically.
+        for loc, fid, args in self.pack.calls:
+            need = self.pack.macro_args.get(fid)
+            if not need:
+                funcs = self.pack.elements.get("function", {})
+                if fid.startswith("mcdp_lib:") and fid not in funcs:
+                    if any(f.startswith("mcdp_lib:") for f in funcs):
+                        self.err(loc, f"no library function '{fid}': look up the name in library/INDEX.md")
+                    else:
+                        self.err(loc, f"'{fid}' needs the library: vendor it with python tools/new_project.py "
+                                      "--update <pack>")
+                continue
+            if args is None or args == "":
+                self.err(loc, f"'{fid}' is a macro function needing {{{', '.join(sorted(need))}}} but is called "
+                              "without arguments (runtime: 'Missing argument', nothing runs)")
+            elif args != "with":
+                keys = self.compound_keys(args)
+                if keys is not None and need - keys:
+                    self.err(loc, f"call to '{fid}' is missing macro argument(s) {', '.join(sorted(need - keys))} "
+                                  "(runtime: 'Missing argument', nothing runs)")
+        self.check_vendored_library()
+
+    def check_vendored_library(self):
+        lib_load = os.path.join("data", "mcdp_lib", "function", "_internal", "load.mcfunction")
+        mine, ref = os.path.join(self.pack.root, lib_load), os.path.join(ROOT, "library", "mcdp_lib", lib_load)
+        if os.path.abspath(mine) == os.path.abspath(ref) or not (os.path.isfile(mine) and os.path.isfile(ref)):
+            return
+        ver = lambda p: (re.search(r'mcdp_lib:meta version set value "([^"]+)"', open(p, encoding="utf-8").read())
+                         or [None, "?"])[1]
+        if ver(mine) != ver(ref):
+            self.warn("data/mcdp_lib", f"vendored mcdp_lib {ver(mine)} differs from library/ {ver(ref)}; "
+                                       "re-vendor with python tools/new_project.py --update <pack>")
 
 
 def component_old_shape(name, value):
@@ -856,6 +947,12 @@ class CommandParser:
             end = self.read_balanced(pos)
             if p == "minecraft:component":
                 self.check_text(pos, s[pos:end])
+            elif p == "minecraft:nbt_path":
+                # verified 26.3: `list[-1]{c:1b}` fails at load ("Invalid NBT path element"); use list[-1].c
+                m = re.search(r"\[-?\d+\]\{", s[pos:end])
+                if m:
+                    raise ParseError(pos + m.start() + 1, "invalid NBT path: an index [n] cannot be followed by a "
+                                     "{compound} filter; test a field instead (list[-1].key)")
             return end
         if p == "minecraft:message":
             return len(s)

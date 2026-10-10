@@ -1,0 +1,1 @@
+{"description": "calling a macro function without key b fails at runtime", "steps": [{"run": "function t:needs_ab {a:1}"}]}

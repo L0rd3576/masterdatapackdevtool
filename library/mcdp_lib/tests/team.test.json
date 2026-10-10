@@ -1,0 +1,23 @@
+{
+  "description": "team/*: setup, join, count, leave, empty, remove",
+  "setup": ["scoreboard objectives add mcdp_lib_t dummy", "kill @e[type=minecraft:marker]",
+            "summon minecraft:marker 1 -60 1 {Tags:[\"t.tm\"]}", "summon minecraft:marker 2 -60 2 {Tags:[\"t.tm\"]}"],
+  "steps": [
+    {"run": "function mcdp_lib:team/setup {name:\"t.red\",color:\"red\",friendly_fire:0b,collision:\"never\",nametag:\"always\"}"},
+    {"run": "function mcdp_lib:team/setup {name:\"t.red\",color:\"blue\",friendly_fire:1b,collision:\"always\",nametag:\"never\"}"},
+    {"assert_output": {"command": "team list", "contains": "t.red"}},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:team/join {name:\"t.red\",selector:\"@e[type=minecraft:marker,tag=t.tm]\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 2}},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:team/count {name:\"t.red\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 2}},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:team/leave {selector:\"@n[type=minecraft:marker,tag=t.tm]\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 1}},
+    {"run": "function mcdp_lib:team/empty {name:\"t.red\"}"},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:team/count {name:\"t.red\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "function mcdp_lib:team/remove {name:\"t.red\"}"},
+    {"assert_output": {"command": "team list", "contains": "There are no teams"}},
+    {"run": "function mcdp_lib:team/setup {name:\"t.x\",color:\"red\"}", "expect_error": "Missing argument"}
+  ],
+  "teardown": ["kill @e[type=minecraft:marker]"]
+}

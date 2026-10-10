@@ -1,0 +1,10 @@
+{
+  "description": "noop returns 0; load published the version",
+  "setup": ["scoreboard objectives add mcdp_lib_t dummy"],
+  "steps": [
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:noop"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 0}},
+    {"assert_score": {"target": "#mcdp_lib", "objective": "load.status", "equals": 10000}},
+    {"assert_data": {"source": "storage mcdp_lib:meta", "path": "version", "equals": "\"1.0.0\""}}
+  ]
+}

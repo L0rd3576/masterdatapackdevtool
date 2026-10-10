@@ -1,0 +1,33 @@
+{
+  "description": "fsm/*: define (initial enter), allowed/forbidden transitions, exit+enter order, tick, get, is",
+  "setup": ["scoreboard objectives add mcdp_lib_t dummy", "scoreboard players reset * mcdp_lib_t"],
+  "steps": [
+    {"run": "data modify storage mcdp_lib:in fsm set value {initial:\"lobby\",states:{lobby:{enter:\"mcdp_lib_test:fsm/lobby_enter\",exit:\"mcdp_lib_test:fsm/lobby_exit\",next:[\"game\"]},game:{enter:\"mcdp_lib_test:fsm/game_enter\",tick:\"mcdp_lib_test:fsm/game_tick\"},end:{}}}"},
+    {"run": "function mcdp_lib:fsm/define {machine:\"m\"}"},
+    {"assert_score": {"target": "#lobby_enter", "objective": "mcdp_lib_t", "equals": 1}},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:fsm/is {machine:\"m\",state:\"lobby\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 1}},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:fsm/set {machine:\"m\",state:\"end\"}"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:fsm/tick {machine:\"m\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:fsm/set {machine:\"m\",state:\"game\"}"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 1}},
+    {"assert_score": {"target": "#lobby_exit", "objective": "mcdp_lib_t", "equals": 1}},
+    {"assert_score": {"target": "#game_enter", "objective": "mcdp_lib_t", "equals": 1}},
+    {"run": "function mcdp_lib:fsm/tick {machine:\"m\"}"},
+    {"run": "function mcdp_lib:fsm/tick {machine:\"m\"}"},
+    {"assert_score": {"target": "#game_tick", "objective": "mcdp_lib_t", "equals": 2}},
+    {"run": "function mcdp_lib:fsm/get {machine:\"m\"}"},
+    {"assert_data": {"source": "storage mcdp_lib:out", "path": "fsm.state", "equals": "\"game\""}},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:fsm/set {machine:\"m\",state:\"end\"}"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 1}},
+    {"run": "execute store result score #r mcdp_lib_t run function mcdp_lib:fsm/tick {machine:\"m\"}"},
+    {"assert_score": {"target": "#r", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:fsm/set {machine:\"m\",state:\"nowhere\"}"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "execute store success score #ok mcdp_lib_t run function mcdp_lib:fsm/get {machine:\"nomachine\"}"},
+    {"assert_score": {"target": "#ok", "objective": "mcdp_lib_t", "equals": 0}},
+    {"run": "function mcdp_lib:fsm/set {machine:\"m\"}", "expect_error": "Missing argument state"}
+  ]
+}
