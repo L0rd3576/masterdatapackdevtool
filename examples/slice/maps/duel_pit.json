@@ -1,0 +1,44 @@
+{
+  "$schema": "../../../schemas/map.schema.json",
+  "id": "duel_pit",
+  "display_name": "Duel Pit",
+  "description": "Small stone pit with a few pillars; PvP only (no breakable tag).",
+  "tags": [
+    "pvp",
+    "small"
+  ],
+  "players": {
+    "min": 3,
+    "max": 6
+  },
+  "size": [
+    21,
+    7,
+    21
+  ],
+  "source": {
+    "generator": "static_arena",
+    "seed": 7,
+    "params": {
+      "size": [
+        21,
+        7,
+        21
+      ],
+      "palette": "stone_arena",
+      "wall_height": 4,
+      "obstacle_density": 0.06,
+      "obstacle_height": [
+        2,
+        3
+      ],
+      "spawn_margin": 3
+    }
+  },
+  "needs_restore": false,
+  "tag_meta": {
+    "pvp": {
+      "kit": "sword"
+    }
+  }
+}

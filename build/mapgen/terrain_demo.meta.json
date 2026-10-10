@@ -1,0 +1,84 @@
+{
+ "id": "terrain_demo",
+ "size": [
+  64,
+  40,
+  64
+ ],
+ "seed": 99,
+ "params": {
+  "size": [
+   64,
+   40,
+   64
+  ],
+  "scale": 26.0,
+  "amplitude": 22,
+  "water_level": 11,
+  "edge_falloff": 6,
+  "offset": [
+   0,
+   0
+  ],
+  "palette": "temperate_terrain",
+  "octaves": 4,
+  "lacunarity": 2.0,
+  "gain": 0.5,
+  "base_height": 6,
+  "beach_band": 1,
+  "peak_height": 28,
+  "soil_depth": 3,
+  "spawn_max_slope": 1,
+  "spawn_grid": 4
+ },
+ "spawns": [
+  [
+   6,
+   13,
+   6
+  ],
+  [
+   58,
+   13,
+   58
+  ],
+  [
+   54,
+   21,
+   10
+  ],
+  [
+   10,
+   13,
+   54
+  ],
+  [
+   30,
+   23,
+   30
+  ],
+  [
+   34,
+   20,
+   54
+  ],
+  [
+   54,
+   13,
+   34
+  ],
+  [
+   10,
+   19,
+   34
+  ]
+ ],
+ "markers": [],
+ "generator_meta": {
+  "min_height": 6,
+  "max_height": 24,
+  "spawn_candidates": 160
+ },
+ "blocks_set": 67683,
+ "sha256": "120d64f44f2976d3430dbb27744236df4234d03c16a68b21128cc3525564f5b7"
+}

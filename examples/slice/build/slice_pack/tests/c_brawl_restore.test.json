@@ -1,0 +1,88 @@
+{
+  "description": "block_brawl on shared_court: broken and placed blocks are restored after the round, dropped items cleared, highest score wins the pot (10 x 3 participants), participation paid to all",
+  "setup": [
+    "summon minecraft:armor_stand 0 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 2 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 4 -60 2 {Tags:[\"t.p\"]}",
+    "execute as @e[tag=t.p] run function slice:queue/join"
+  ],
+  "steps": [
+    {
+      "run": "function slice:round/start_with {game:\"block_brawl\",map:\"shared_court\",preset:\"default\"}"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "assert": "in slice:arena if block 269 64 13 minecraft:gold_block"
+    },
+    {
+      "run": "execute in slice:arena run setblock 269 64 13 minecraft:air"
+    },
+    {
+      "run": "execute in slice:arena run setblock 261 65 5 minecraft:white_wool"
+    },
+    {
+      "run": "execute in slice:arena run summon minecraft:item 262 65 6 {Item:{id:\"minecraft:white_wool\",count:1}}"
+    },
+    {
+      "assert": "in slice:arena if block 269 64 13 minecraft:air"
+    },
+    {
+      "run": "scoreboard players set @e[tag=t.p,limit=1] slice.score 5"
+    },
+    {
+      "run": "function slice:round/end"
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 4
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=31}]",
+        "contains": "Count: 1"
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=1}]",
+        "contains": "Count: 2"
+      }
+    },
+    {
+      "assert": "in slice:arena unless entity @e[type=minecraft:item,x=256,y=64,z=0,dx=26,dy=6,dz=26]"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    },
+    {
+      "assert": "in slice:arena if block 269 64 13 minecraft:gold_block"
+    },
+    {
+      "assert": "in slice:arena if block 261 65 5 minecraft:air"
+    }
+  ],
+  "teardown": [
+    "kill @e[tag=t.p]",
+    "scoreboard players reset * slice.coins",
+    "tag @e remove slice.queued"
+  ]
+}

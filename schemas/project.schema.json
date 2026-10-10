@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "project.schema.json",
+  "title": "Framework project (project.json next to minigames/, maps/, presets/, pool.json)",
+  "type": "object",
+  "required": ["namespace"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "namespace": {"type": "string", "pattern": "^[a-z0-9_]{1,24}$", "description": "Datapack namespace; also prefixes objectives, tags and storages."},
+    "description": {"type": "string", "default": "Minigame framework pack (built by tools/build_pack.py)"},
+    "output": {"type": "string", "default": "build/pack", "description": "Output datapack dir, relative to the project dir. Overwritten on every build."},
+    "lib_prefix": {"type": "string", "pattern": "^[a-z0-9_]+$", "default": "mcdp_lib", "description": "Namespace of the vendored function library."},
+    "players": {
+      "$ref": "common.schema.json#/definitions/player_range",
+      "default": {"min": 1, "max": 16},
+      "description": "Player counts the selector is compiled for (a candidate list per count)."
+    },
+    "arena": {
+      "type": "object",
+      "properties": {
+        "dimension": {"$ref": "common.schema.json#/definitions/id", "default": "arena", "description": "Name of the void dimension the pack defines (<ns>:<dimension>)."},
+        "dimension_type": {"type": "string", "default": "minecraft:overworld"},
+        "biome": {"type": "string", "default": "minecraft:the_void"},
+        "base_y": {"type": "integer", "default": 64, "description": "World y of each map's local y = 0."},
+        "slot_origin": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2, "default": [0, 0]},
+        "slot_spacing": {"type": "integer", "minimum": 16, "default": 256, "description": "Distance along x between map slots (must exceed the largest map + margin)."},
+        "slot_margin": {"type": "integer", "minimum": 0, "default": 16}
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "currency": {
+      "type": "object",
+      "properties": {
+        "objective": {"type": "string", "pattern": "^[A-Za-z0-9_.+-]{1,32}$", "default": "coins", "description": "Objective name without the namespace prefix (<ns>.<objective>)."},
+        "display_name": {"type": "string", "default": "Coins"}
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "placement": {
+      "type": "object",
+      "properties": {
+        "tiles_per_tick": {"type": "integer", "minimum": 1, "description": "Override; default = config max_blocks_per_tick / tile volume."}
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "end_delay_ticks": {"type": "integer", "minimum": 0, "default": 0, "description": "Ticks between the round ending and teardown."},
+    "gallery": {"type": "boolean", "default": true, "description": "Also compile the map gallery (function <ns>:gallery/build)."},
+    "tests": {"type": "string", "default": "tests", "description": "Dir of *.test.json copied into the built pack."}
+  },
+  "additionalProperties": false
+}

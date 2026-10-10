@@ -1,0 +1,120 @@
+{
+ "id": "maze_rooms",
+ "size": [
+  31,
+  5,
+  31
+ ],
+ "seed": "maze-1",
+ "params": {
+  "grid": [
+   3,
+   3
+  ],
+  "room_size": [
+   7,
+   7
+  ],
+  "wall_height": 4,
+  "corridor_width": 3,
+  "corridor_length": 2,
+  "loop_chance": 0.25,
+  "palette": "mossy_maze",
+  "door_height": 3,
+  "roof": false,
+  "pieces": [
+   {
+    "type": "builtin",
+    "name": "empty",
+    "weight": 3
+   },
+   {
+    "type": "builtin",
+    "name": "pillars",
+    "weight": 2
+   },
+   {
+    "type": "builtin",
+    "name": "center_block",
+    "weight": 2
+   },
+   {
+    "type": "builtin",
+    "name": "planter",
+    "weight": 1
+   }
+  ],
+  "objective_rooms": 1
+ },
+ "spawns": [
+  [
+   5,
+   1,
+   4
+  ],
+  [
+   29,
+   1,
+   29
+  ],
+  [
+   1,
+   1,
+   29
+  ],
+  [
+   29,
+   1,
+   1
+  ],
+  [
+   16,
+   1,
+   15
+  ],
+  [
+   4,
+   1,
+   15
+  ],
+  [
+   15,
+   1,
+   26
+  ],
+  [
+   27,
+   1,
+   15
+  ],
+  [
+   18,
+   1,
+   1
+  ],
+  [
+   7,
+   1,
+   23
+  ]
+ ],
+ "markers": [
+  {
+   "id": "goal_0",
+   "type": "objective",
+   "pos": [
+    26,
+    1,
+    26
+   ],
+   "reachable": true
+  }
+ ],
+ "generator_meta": {
+  "rooms": 9,
+  "connections": 8,
+  "tree_edges": 8
+ },
+ "blocks_set": 2245,
+ "sha256": "db4fc71f3dbaff84e8bcf46335c7721a4b1e28505f403de615905242221fc788"
+}

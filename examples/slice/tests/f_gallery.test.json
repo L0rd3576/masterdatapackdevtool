@@ -1,0 +1,17 @@
+{
+  "description": "gallery/build places every pool map side by side in the arena dimension with 3 labels each",
+  "steps": [
+    {
+      "run": "function slice:gallery/build"
+    },
+    {
+      "assert": "in slice:arena if block 0 64 4096 minecraft:smooth_stone"
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[type=minecraft:text_display,tag=slice.gallery]",
+        "contains": "Count: 9"
+      }
+    }
+  ]
+}

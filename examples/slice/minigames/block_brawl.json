@@ -1,0 +1,45 @@
+{
+  "$schema": "../../../schemas/minigame.schema.json",
+  "id": "block_brawl",
+  "display_name": "Block Brawl",
+  "description": "Mine the most wool before time runs out; the map is restored afterwards.",
+  "players": {
+    "min": 3,
+    "max": 10
+  },
+  "map_tags": {
+    "any_of": [
+      "breakable"
+    ]
+  },
+  "rules": {
+    "block_break": true,
+    "block_place": true,
+    "pvp": false,
+    "keep_inventory": true,
+    "hunger": false,
+    "time_limit_seconds": 90,
+    "respawn": "respawn"
+  },
+  "settings": {
+    "score_to_win": {
+      "type": "int",
+      "default": 16,
+      "min": 1,
+      "max": 64,
+      "description": "Wool mined to win early (0 = time limit only)."
+    }
+  },
+  "win_condition": "highest_score",
+  "payout": {
+    "type": "pot",
+    "base": 0,
+    "per_participant": 10,
+    "participation": 1
+  },
+  "functions": {
+    "load": "logic/block_brawl/load.mcfunction",
+    "start": "logic/block_brawl/start.mcfunction",
+    "tick": "logic/block_brawl/tick.mcfunction"
+  }
+}

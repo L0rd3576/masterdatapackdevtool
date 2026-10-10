@@ -1,0 +1,74 @@
+{
+  "description": "build_pack compiled the pool: per-count candidate lists respect tags and player ranges; maps/games are in storage",
+  "steps": [
+    {
+      "assert_data": {
+        "source": "storage slice:registry",
+        "path": "maps.shared_court.needs_restore",
+        "equals": "1b"
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:registry",
+        "path": "maps.duel_pit.origin",
+        "equals": "{x:0,y:64,z:0}"
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:registry",
+        "path": "games.pvp_arena.variants.pvp_quick.settings.kit",
+        "equals": "\"axe\""
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:registry",
+        "path": "games.pvp_arena.variants.default.rules_lib.gamemode",
+        "equals": "\"adventure\""
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:registry",
+        "path": "games.block_brawl.variants.default.rules_lib.gamemode",
+        "equals": "\"survival\""
+      }
+    },
+    {
+      "assert": "unless data storage slice:registry by_count.n10[{value:{game:\"pvp_arena\"}}]"
+    },
+    {
+      "assert": "if data storage slice:registry by_count.n10[{value:{map:\"maze_rooms\"}}]"
+    },
+    {
+      "assert": "unless data storage slice:registry by_count.n3[{value:{map:\"maze_rooms\"}}]"
+    },
+    {
+      "assert": "unless data storage slice:registry by_count.n8[{value:{map:\"duel_pit\"}}]"
+    },
+    {
+      "assert": "if data storage slice:registry by_count.n6[{value:{map:\"duel_pit\",preset:\"pvp_quick\"}}]"
+    },
+    {
+      "assert": "unless data storage slice:registry by_count.n2"
+    },
+    {
+      "assert": "unless data storage slice:registry by_count.n11"
+    },
+    {
+      "assert_output": {
+        "command": "execute if data storage slice:registry by_count.n3[]",
+        "contains": "Count: 5"
+      }
+    },
+    {
+      "assert_score": {
+        "target": "#tiles_per_tick",
+        "objective": "slice.cfg",
+        "equals": 2
+      }
+    }
+  ]
+}

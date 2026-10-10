@@ -1,0 +1,170 @@
+{
+  "$schema": "../../schemas/mapgen-config.schema.json",
+  "_comment": "Tool-level settings for tools/mapgen and tools/build_pack.py. Game-fixed values live in constants.py.",
+  "output_dir": "build/mapgen",
+  "plugin_dirs": {
+    "generators": ["tools/mapgen/generators"],
+    "validators": ["tools/mapgen/validators"]
+  },
+  "seed": {
+    "mode": "derive",
+    "salt": "mcdp-mapgen-1",
+    "_comment": "derive: a manifest without source.seed uses sha256(salt + map id); fixed: source.seed is required"
+  },
+  "structure": {
+    "fill_air": true,
+    "_comment": "fill_air writes air into every untouched cell so placing the template clears the volume (restore relies on it)"
+  },
+  "limits": {
+    "max_size": [256, 192, 256],
+    "max_volume": 4194304,
+    "_comment": "place template accepted 200x1x200 and 64x4x64 templates on 26.3 (knowledge/mapgen.md); world height comes from constants.py"
+  },
+  "placement": {
+    "tile_size": [16, 16, 16],
+    "max_blocks_per_tick": 8192,
+    "max_build_ticks": 600,
+    "_comment": "placing ~40000 blocks took ~250 ms on the 26.3 test server (~160 blocks/ms); 8192 blocks ~ one 50 ms tick"
+  },
+  "default_palette": "stone_arena",
+  "palettes": {
+    "stone_arena": {
+      "floor": "minecraft:smooth_stone",
+      "floor_alt": "minecraft:polished_andesite",
+      "wall": "minecraft:stone_bricks",
+      "wall_top": "minecraft:stone_brick_slab",
+      "accent": "minecraft:chiseled_stone_bricks",
+      "light": "minecraft:sea_lantern",
+      "ceiling": "minecraft:glass",
+      "corridor": "minecraft:polished_andesite",
+      "spawn_pad": "minecraft:polished_diorite",
+      "objective": "minecraft:gold_block",
+      "obstacle": [
+        {"block": "minecraft:cobblestone", "weight": 3},
+        {"block": "minecraft:mossy_cobblestone", "weight": 1},
+        {"block": "minecraft:stone_bricks", "weight": 2}
+      ]
+    },
+    "sandstone_court": {
+      "floor": "minecraft:smooth_sandstone",
+      "floor_alt": "minecraft:cut_sandstone",
+      "wall": "minecraft:sandstone",
+      "wall_top": "minecraft:sandstone_slab",
+      "accent": "minecraft:chiseled_sandstone",
+      "light": "minecraft:glowstone",
+      "ceiling": "minecraft:glass",
+      "corridor": "minecraft:cut_sandstone",
+      "spawn_pad": "minecraft:orange_terracotta",
+      "objective": "minecraft:gold_block",
+      "obstacle": [
+        {"block": "minecraft:white_wool", "weight": 3},
+        {"block": "minecraft:orange_wool", "weight": 1}
+      ]
+    },
+    "mossy_maze": {
+      "floor": "minecraft:moss_block",
+      "floor_alt": "minecraft:mossy_stone_bricks",
+      "wall": "minecraft:mossy_stone_bricks",
+      "wall_top": "minecraft:mossy_stone_brick_slab",
+      "accent": "minecraft:cracked_stone_bricks",
+      "light": "minecraft:glowstone",
+      "ceiling": "minecraft:glass",
+      "corridor": "minecraft:mossy_cobblestone",
+      "spawn_pad": "minecraft:polished_andesite",
+      "objective": "minecraft:gold_block",
+      "obstacle": [
+        {"block": "minecraft:oak_leaves[persistent=true]", "weight": 2},
+        {"block": "minecraft:mossy_cobblestone", "weight": 1}
+      ]
+    },
+    "temperate_terrain": {
+      "top": "minecraft:grass_block",
+      "fill": "minecraft:dirt",
+      "deep": "minecraft:stone",
+      "beach": "minecraft:sand",
+      "water": "minecraft:water",
+      "peak": "minecraft:snow_block",
+      "base": "minecraft:stone"
+    }
+  },
+  "blocks": {
+    "_comment": "Glob patterns over block ids. passable = no collision (players walk through); hazard = must not spawn on/in/next to.",
+    "passable": [
+      "minecraft:air", "minecraft:cave_air", "minecraft:void_air", "minecraft:structure_void", "minecraft:light",
+      "minecraft:short_grass", "minecraft:tall_grass", "minecraft:fern", "minecraft:large_fern", "minecraft:dead_bush",
+      "minecraft:dandelion", "minecraft:poppy", "minecraft:*_tulip", "minecraft:cornflower", "minecraft:azure_bluet",
+      "minecraft:torch", "minecraft:wall_torch", "minecraft:*_sign", "minecraft:*_wall_sign", "minecraft:*_button",
+      "minecraft:*_pressure_plate", "minecraft:*_carpet", "minecraft:rail", "minecraft:redstone_wire",
+      "minecraft:water", "minecraft:lava", "minecraft:fire", "minecraft:soul_fire", "minecraft:snow", "minecraft:vine"
+    ],
+    "not_standable": ["minecraft:water", "minecraft:lava", "minecraft:fire", "minecraft:soul_fire"],
+    "hazard": [
+      "minecraft:lava", "minecraft:fire", "minecraft:soul_fire", "minecraft:magma_block", "minecraft:cactus",
+      "minecraft:sweet_berry_bush", "minecraft:wither_rose", "minecraft:powder_snow", "minecraft:campfire",
+      "minecraft:soul_campfire", "minecraft:pointed_dripstone", "minecraft:water"
+    ]
+  },
+  "movement": {
+    "_comment": "Cells. Derived from verified 26.3 attribute defaults (constants.py): step_height 0.6 (< 1 block, so a 1-block rise needs a jump), jump apex 1.2522 blocks from jump_strength 0.42/gravity 0.08, safe_fall_distance 3, player height 1.8.",
+    "headroom": 2,
+    "jump_up": 1,
+    "jump_headroom": 3,
+    "max_drop": 3,
+    "diagonal": false
+  },
+  "spawns": {
+    "min_spacing": 3,
+    "y_offset": 1
+  },
+  "validators": {
+    "enabled": [
+      "bounds", "spawn_count", "spawn_ground", "spawn_hazard", "spawn_reachability", "markers_reachable",
+      "void_gaps", "determinism", "build_budget", "server_load"
+    ],
+    "settings": {}
+  },
+  "render": {
+    "scale": 8,
+    "layer_scale": 6,
+    "shade_by_height": true,
+    "background": "#1b1b1f",
+    "untouched": "#000000",
+    "air": "#2a2a30",
+    "grid_every": 8,
+    "grid_color": "#3a3a44",
+    "markers": {"spawn": "#ff2a2a", "objective": "#ffd400", "other": "#2ad4ff"},
+    "colors": {
+      "minecraft:smooth_stone": "#9e9e9e", "minecraft:polished_andesite": "#868a8c", "minecraft:stone_bricks": "#6f6f6f",
+      "minecraft:stone_brick_slab": "#777777", "minecraft:chiseled_stone_bricks": "#7c7c7c", "minecraft:sea_lantern": "#c8e0dc",
+      "minecraft:glass": "#c0e8ff", "minecraft:polished_diorite": "#d8d8d8", "minecraft:gold_block": "#f5d23c",
+      "minecraft:cobblestone": "#5f5f5f", "minecraft:mossy_cobblestone": "#5f7050", "minecraft:smooth_sandstone": "#e0d6a8",
+      "minecraft:cut_sandstone": "#d9cf9b", "minecraft:sandstone": "#d6cc96", "minecraft:sandstone_slab": "#d6cc96",
+      "minecraft:chiseled_sandstone": "#cfc48d", "minecraft:glowstone": "#f2d07a", "minecraft:orange_terracotta": "#a2531f",
+      "minecraft:white_wool": "#eaeaea", "minecraft:orange_wool": "#f07613", "minecraft:moss_block": "#5a7a2c",
+      "minecraft:mossy_stone_bricks": "#6a7560", "minecraft:mossy_stone_brick_slab": "#6a7560",
+      "minecraft:cracked_stone_bricks": "#686868", "minecraft:oak_leaves": "#3f7f2a", "minecraft:grass_block": "#6aa84f",
+      "minecraft:dirt": "#866043", "minecraft:stone": "#7d7d7d", "minecraft:sand": "#dbd3a0", "minecraft:water": "#3f6fd8",
+      "minecraft:snow_block": "#f4fafa", "minecraft:lava": "#e85a10", "minecraft:bedrock": "#333333",
+      "minecraft:*_wool": "#b0b0b0", "minecraft:*_planks": "#a0824e"
+    }
+  },
+  "ascii": {
+    "untouched": " ",
+    "default": "#",
+    "spawn": "S",
+    "objective": "O",
+    "chars": {
+      "minecraft:air": ".", "minecraft:water": "~", "minecraft:lava": "L", "minecraft:glass": "g",
+      "minecraft:gold_block": "G", "minecraft:sea_lantern": "*", "minecraft:glowstone": "*"
+    }
+  },
+  "server_check": {
+    "sample_blocks": 48,
+    "boot_timeout_seconds": 180
+  },
+  "gallery": {
+    "origin": [0, 64, 4096],
+    "spacing": 16,
+    "label_height": 3
+  }
+}

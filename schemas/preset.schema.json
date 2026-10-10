@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "preset.schema.json",
+  "title": "Preset: named overrides of a minigame's settings (and optionally its rules)",
+  "type": "object",
+  "required": ["id", "minigame", "settings"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "id": {"$ref": "common.schema.json#/definitions/id"},
+    "minigame": {"$ref": "common.schema.json#/definitions/id", "description": "Minigame id these overrides apply to."},
+    "display_name": {"type": "string"},
+    "description": {"type": "string"},
+    "settings": {"type": "object", "description": "setting name -> value; checked against the minigame's settings (type, min, max)."},
+    "rules": {"$ref": "minigame.schema.json#/definitions/rules", "description": "Optional rule overrides."}
+  },
+  "additionalProperties": false
+}

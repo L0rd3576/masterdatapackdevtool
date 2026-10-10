@@ -1,0 +1,36 @@
+{
+  "$schema": "../../../schemas/map.schema.json",
+  "id": "shared_court",
+  "display_name": "Shared Court (authoring source)",
+  "description": "Generator settings used once to export structures/shared_court.nbt; the pool map uses the exported file.",
+  "tags": [
+    "pvp",
+    "breakable",
+    "open"
+  ],
+  "players": {
+    "min": 3,
+    "max": 10
+  },
+  "source": {
+    "generator": "static_arena",
+    "seed": 2024,
+    "params": {
+      "size": [
+        27,
+        7,
+        27
+      ],
+      "palette": "sandstone_court",
+      "wall_height": 3,
+      "floor_pattern": "border",
+      "obstacle_density": 0.08,
+      "obstacle_height": [
+        1,
+        2
+      ],
+      "spawn_margin": 4,
+      "light_every": 5
+    }
+  }
+}

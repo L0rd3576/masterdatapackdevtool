@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../schemas/preset.schema.json",
+  "id": "pvp_quick",
+  "minigame": "pvp_arena",
+  "display_name": "Quick PvP (axes, 60 s)",
+  "settings": {
+    "kit": "axe"
+  },
+  "rules": {
+    "time_limit_seconds": 60
+  }
+}

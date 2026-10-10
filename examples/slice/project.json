@@ -1,0 +1,27 @@
+{
+  "$schema": "../../schemas/project.schema.json",
+  "namespace": "slice",
+  "description": "Vertical slice: 2 minigames, 3 maps (built by tools/build_pack.py)",
+  "output": "build/slice_pack",
+  "lib_prefix": "mcdp_lib",
+  "players": {
+    "min": 3,
+    "max": 10
+  },
+  "arena": {
+    "dimension": "arena",
+    "base_y": 64,
+    "slot_origin": [
+      0,
+      0
+    ],
+    "slot_spacing": 256
+  },
+  "currency": {
+    "objective": "coins",
+    "display_name": "Coins"
+  },
+  "end_delay_ticks": 0,
+  "gallery": true,
+  "tests": "tests"
+}

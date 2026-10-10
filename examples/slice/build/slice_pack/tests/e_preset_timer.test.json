@@ -1,0 +1,71 @@
+{
+  "description": "preset pvp_quick overrides settings (kit axe) and rules (60 s); when the round timer runs out every survivor wins (linear 10 + 5 x 3, +2 participation), then shared_court is restored",
+  "setup": [
+    "summon minecraft:armor_stand 0 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 2 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 4 -60 2 {Tags:[\"t.p\"]}",
+    "execute as @e[tag=t.p] run function slice:queue/join"
+  ],
+  "steps": [
+    {
+      "run": "function slice:round/start_with {game:\"pvp_arena\",map:\"shared_court\",preset:\"pvp_quick\"}"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:round",
+        "path": "current.settings.kit",
+        "equals": "\"axe\""
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:round",
+        "path": "current.rules.time_limit_seconds",
+        "equals": "60"
+      }
+    },
+    {
+      "assert_output": {
+        "command": "scoreboard players get #global slice.rtimer",
+        "matches": "has 1[0-9]{3} "
+      }
+    },
+    {
+      "run": "scoreboard players set #global slice.rtimer 2"
+    },
+    {
+      "ticks": 3
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=27}]",
+        "contains": "Count: 3"
+      }
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    }
+  ],
+  "teardown": [
+    "kill @e[tag=t.p]",
+    "scoreboard players reset * slice.coins",
+    "tag @e remove slice.queued"
+  ]
+}

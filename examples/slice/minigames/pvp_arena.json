@@ -1,0 +1,48 @@
+{
+  "$schema": "../../../schemas/minigame.schema.json",
+  "id": "pvp_arena",
+  "display_name": "PvP Arena",
+  "description": "Last one standing; the map cannot be changed.",
+  "players": {
+    "min": 3,
+    "max": 8
+  },
+  "map_tags": {
+    "all_of": [
+      "pvp"
+    ],
+    "none_of": [
+      "maze"
+    ]
+  },
+  "rules": {
+    "block_break": false,
+    "block_place": false,
+    "pvp": true,
+    "keep_inventory": true,
+    "hunger": false,
+    "time_limit_seconds": 120,
+    "respawn": "eliminate"
+  },
+  "settings": {
+    "kit": {
+      "type": "string",
+      "default": "sword",
+      "options": [
+        "sword",
+        "axe"
+      ],
+      "description": "Weapon handed out at start."
+    }
+  },
+  "win_condition": "last_standing",
+  "payout": {
+    "type": "linear",
+    "base": 10,
+    "per_participant": 5,
+    "participation": 2
+  },
+  "functions": {
+    "player_start": "logic/pvp_arena/player_start.mcfunction"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "description": "round/start picks only compatible combinations for the queued count (10 -> block_brawl only, 3 -> never maze_rooms) and fails cleanly when nothing fits (2)",
+  "setup": [
+    "scoreboard objectives add t.s dummy",
+    "summon minecraft:armor_stand 0 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 2 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 4 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 6 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 8 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 10 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 12 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 14 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 16 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 18 -60 2 {Tags:[\"t.p\"]}",
+    "execute as @e[tag=t.p] run function slice:queue/join"
+  ],
+  "steps": [
+    {
+      "run": "function slice:round/start"
+    },
+    {
+      "assert": "if data storage slice:round current.game{id:\"block_brawl\"}"
+    },
+    {
+      "assert_score": {
+        "target": "#n",
+        "objective": "slice.round",
+        "equals": 10
+      }
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "run": "function slice:round/abort"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    },
+    {
+      "assert": "entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"
+    },
+    {
+      "run": "kill @e[tag=t.p,limit=7]"
+    },
+    {
+      "run": "execute as @e[tag=t.p] run function slice:queue/join"
+    },
+    {
+      "run": "function slice:round/start"
+    },
+    {
+      "assert": "unless data storage slice:round current.map{id:\"maze_rooms\"}"
+    },
+    {
+      "assert_score": {
+        "target": "#n",
+        "objective": "slice.round",
+        "equals": 3
+      }
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "run": "function slice:round/abort"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    },
+    {
+      "run": "kill @e[tag=t.p,limit=1]"
+    },
+    {
+      "run": "execute as @e[tag=t.p] run function slice:queue/join"
+    },
+    {
+      "run": "execute store success score #ok t.s run function slice:round/start"
+    },
+    {
+      "assert_score": {
+        "target": "#ok",
+        "objective": "t.s",
+        "equals": 0
+      }
+    },
+    {
+      "assert": "data storage slice:round {last_error:\"no minigame/map fits the participant count\"}"
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    }
+  ],
+  "teardown": [
+    "kill @e[tag=t.p]",
+    "scoreboard players reset * slice.coins",
+    "tag @e remove slice.queued"
+  ]
+}

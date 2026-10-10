@@ -1,0 +1,33 @@
+{
+  "$schema": "../../schemas/map.schema.json",
+  "id": "terrain_demo",
+  "display_name": "Terrain Demo",
+  "description": "heightmap_terrain scaffolding demo (not in a pool). Open terrain has no walls, so void_gaps is relaxed: the edges are open by design.",
+  "tags": [
+    "terrain"
+  ],
+  "players": {
+    "min": 2,
+    "max": 8
+  },
+  "source": {
+    "generator": "heightmap_terrain",
+    "seed": 99,
+    "params": {
+      "size": [
+        64,
+        40,
+        64
+      ],
+      "scale": 26.0,
+      "amplitude": 22,
+      "water_level": 11,
+      "edge_falloff": 6
+    }
+  },
+  "validation": {
+    "void_gaps": {
+      "max_gaps": 100000
+    }
+  }
+}

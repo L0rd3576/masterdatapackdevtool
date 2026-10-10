@@ -1,0 +1,2 @@
+#> slice:queue/join - as @s: join the queue for the next round (players, or stand-in entities in tests)
+tag @s add slice.queued

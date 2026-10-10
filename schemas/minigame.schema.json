@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "minigame.schema.json",
+  "title": "Minigame manifest (minigames/<id>.json)",
+  "type": "object",
+  "required": ["id", "display_name", "players", "win_condition", "payout"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "id": {"$ref": "common.schema.json#/definitions/id"},
+    "display_name": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "default": ""},
+    "players": {"$ref": "common.schema.json#/definitions/player_range"},
+    "map_tags": {
+      "type": "object",
+      "description": "Which maps this minigame can use. A map qualifies if it has every all_of tag, at least one any_of tag (when any_of is non-empty) and no none_of tag.",
+      "properties": {
+        "all_of": {"$ref": "common.schema.json#/definitions/tag_list", "default": []},
+        "any_of": {"$ref": "common.schema.json#/definitions/tag_list", "default": []},
+        "none_of": {"$ref": "common.schema.json#/definitions/tag_list", "default": []}
+      },
+      "additionalProperties": false,
+      "default": {"all_of": [], "any_of": [], "none_of": []}
+    },
+    "rules": {"$ref": "#/definitions/rules", "default": {}},
+    "settings": {
+      "type": "object",
+      "description": "Tweakable settings (name -> spec). Values reach game logic as storage <ns>:round settings.<name>.",
+      "propertyNames": {"pattern": "^[a-z0-9_]{1,32}$"},
+      "additionalProperties": {"$ref": "#/definitions/setting"},
+      "default": {}
+    },
+    "win_condition": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$",
+      "description": "Id of a framework win condition (a folder tools/framework/pack/data/__ns__/function/win/<id>/): last_standing, highest_score, survive."
+    },
+    "payout": {"$ref": "#/definitions/payout"},
+    "functions": {
+      "type": "object",
+      "description": "Minigame-specific hook files (paths relative to the project dir). Missing hooks do nothing.",
+      "properties": {
+        "load": {"type": "string", "description": "Runs from #minecraft:load (create objectives here)."},
+        "start": {"type": "string", "description": "Once when the round starts (after rules and teleports)."},
+        "player_start": {"type": "string", "description": "As/at each participant when the round starts."},
+        "tick": {"type": "string", "description": "Every tick while the round runs."},
+        "eliminated": {"type": "string", "description": "As a participant when it is eliminated."},
+        "end": {"type": "string", "description": "Once when the round ends, before payout and teardown."}
+      },
+      "additionalProperties": false,
+      "default": {}
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "rules": {
+      "type": "object",
+      "description": "Round rules. Every key is optional; defaults below.",
+      "properties": {
+        "block_break": {"type": "boolean", "default": false, "description": "Players may break blocks."},
+        "block_place": {"type": "boolean", "default": false, "description": "Players may place blocks."},
+        "pvp": {"type": "boolean", "default": true},
+        "keep_inventory": {"type": "boolean", "default": true},
+        "hunger": {"type": "boolean", "default": false, "description": "false = saturation effect for the round."},
+        "natural_regeneration": {"type": "boolean", "default": true},
+        "fall_damage": {"type": "boolean", "default": true},
+        "time_limit_seconds": {"type": "integer", "minimum": 0, "default": 180, "description": "0 = no time limit."},
+        "respawn": {"type": "string", "enum": ["eliminate", "respawn"], "default": "eliminate",
+                    "description": "On death: eliminate (spectator until the round ends) or respawn at a map spawn."},
+        "gamemode": {"type": "string", "enum": ["auto", "adventure", "survival", "creative", "spectator"], "default": "auto",
+                     "description": "auto = adventure unless block_place or block_break is true (then survival)."},
+        "clear_inventory": {"type": "boolean", "default": true, "description": "Save and clear participant inventories at start; restored at teardown."},
+        "effects": {
+          "type": "array", "default": [],
+          "items": {
+            "type": "object", "required": ["id"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^([a-z0-9_.-]+:)?[a-z0-9_./-]+$"},
+              "duration": {"type": ["integer", "string"], "default": "infinite"},
+              "amplifier": {"type": "integer", "minimum": 0, "maximum": 255, "default": 0},
+              "hide": {"type": "boolean", "default": true}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "setting": {
+      "type": "object",
+      "required": ["type", "default"],
+      "properties": {
+        "type": {"type": "string", "enum": ["int", "bool", "string"]},
+        "default": {"type": ["integer", "boolean", "string"]},
+        "min": {"type": "integer"},
+        "max": {"type": "integer"},
+        "options": {"type": "array", "items": {"type": "string"}, "description": "Allowed values for string settings."},
+        "description": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "payout": {
+      "type": "object",
+      "required": ["type"],
+      "description": "Currency awarded at round end. n = participants at round start.",
+      "properties": {
+        "type": {"type": "string", "enum": ["linear", "pot"],
+                 "description": "linear: each winner gets base + per_participant*n. pot: (base + per_participant*n) split evenly between winners (floor)."},
+        "base": {"type": "integer", "minimum": 0, "default": 0},
+        "per_participant": {"type": "integer", "minimum": 0, "default": 0},
+        "participation": {"type": "integer", "minimum": 0, "default": 0, "description": "Every participant (winners too) also gets this."}
+      },
+      "additionalProperties": false
+    }
+  }
+}

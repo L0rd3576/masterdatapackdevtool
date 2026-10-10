@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mapgen-config.schema.json",
+  "title": "tools/mapgen/config.json",
+  "type": "object",
+  "required": ["output_dir", "plugin_dirs", "seed", "structure", "limits", "placement", "default_palette", "palettes", "blocks", "movement", "spawns", "validators", "render", "ascii"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "output_dir": {"type": "string"},
+    "plugin_dirs": {
+      "type": "object", "required": ["generators", "validators"],
+      "properties": {
+        "generators": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "validators": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      },
+      "additionalProperties": false
+    },
+    "seed": {
+      "type": "object", "required": ["mode"],
+      "properties": {"mode": {"enum": ["derive", "fixed"]}, "salt": {"type": "string", "default": ""}},
+      "additionalProperties": false
+    },
+    "structure": {"type": "object", "properties": {"fill_air": {"type": "boolean"}}, "additionalProperties": false},
+    "limits": {
+      "type": "object", "required": ["max_size", "max_volume"],
+      "properties": {"max_size": {"$ref": "common.schema.json#/definitions/size3"}, "max_volume": {"type": "integer", "minimum": 1}},
+      "additionalProperties": false
+    },
+    "placement": {
+      "type": "object", "required": ["tile_size", "max_blocks_per_tick", "max_build_ticks"],
+      "properties": {
+        "tile_size": {"$ref": "common.schema.json#/definitions/size3"},
+        "max_blocks_per_tick": {"type": "integer", "minimum": 1},
+        "max_build_ticks": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "default_palette": {"type": "string"},
+    "palettes": {
+      "type": "object", "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "oneOf": [
+            {"$ref": "common.schema.json#/definitions/block_state"},
+            {"type": "array", "minItems": 1, "items": {"$ref": "common.schema.json#/definitions/weighted_block"}}
+          ]
+        }
+      }
+    },
+    "blocks": {
+      "type": "object", "required": ["passable", "not_standable", "hazard"],
+      "properties": {
+        "passable": {"type": "array", "items": {"type": "string"}},
+        "not_standable": {"type": "array", "items": {"type": "string"}},
+        "hazard": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "movement": {
+      "type": "object", "required": ["headroom", "jump_up", "jump_headroom", "max_drop"],
+      "properties": {
+        "headroom": {"type": "integer", "minimum": 1},
+        "jump_up": {"type": "integer", "minimum": 0},
+        "jump_headroom": {"type": "integer", "minimum": 1},
+        "max_drop": {"type": "integer", "minimum": 0},
+        "diagonal": {"type": "boolean", "default": false}
+      },
+      "additionalProperties": false
+    },
+    "spawns": {
+      "type": "object",
+      "properties": {"min_spacing": {"type": "integer", "minimum": 0}, "y_offset": {"type": "integer"}},
+      "additionalProperties": false
+    },
+    "validators": {
+      "type": "object", "required": ["enabled"],
+      "properties": {
+        "enabled": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "settings": {"type": "object", "additionalProperties": {"type": "object"}}
+      },
+      "additionalProperties": false
+    },
+    "render": {
+      "type": "object", "required": ["scale", "colors", "markers"],
+      "properties": {
+        "scale": {"type": "integer", "minimum": 1, "maximum": 32},
+        "layer_scale": {"type": "integer", "minimum": 1, "maximum": 32},
+        "shade_by_height": {"type": "boolean"},
+        "background": {"$ref": "#/definitions/color"},
+        "untouched": {"$ref": "#/definitions/color"},
+        "air": {"$ref": "#/definitions/color"},
+        "grid_every": {"type": "integer", "minimum": 0},
+        "grid_color": {"$ref": "#/definitions/color"},
+        "markers": {"type": "object", "additionalProperties": {"$ref": "#/definitions/color"}},
+        "colors": {"type": "object", "additionalProperties": {"$ref": "#/definitions/color"}}
+      },
+      "additionalProperties": false
+    },
+    "ascii": {
+      "type": "object",
+      "properties": {
+        "untouched": {"type": "string", "minLength": 1, "maxLength": 1},
+        "default": {"type": "string", "minLength": 1, "maxLength": 1},
+        "spawn": {"type": "string", "minLength": 1, "maxLength": 1},
+        "objective": {"type": "string", "minLength": 1, "maxLength": 1},
+        "chars": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1, "maxLength": 1}}
+      },
+      "additionalProperties": false
+    },
+    "server_check": {
+      "type": "object",
+      "properties": {"sample_blocks": {"type": "integer", "minimum": 1}, "boot_timeout_seconds": {"type": "integer", "minimum": 10}},
+      "additionalProperties": false
+    },
+    "gallery": {
+      "type": "object",
+      "properties": {
+        "origin": {"$ref": "common.schema.json#/definitions/vec3i"},
+        "spacing": {"type": "integer", "minimum": 1},
+        "label_height": {"type": "integer"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "color": {"type": "string", "pattern": "^#[0-9a-fA-F]{6}$"}
+  }
+}

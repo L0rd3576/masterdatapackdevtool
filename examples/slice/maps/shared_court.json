@@ -1,0 +1,95 @@
+{
+  "$schema": "../../../schemas/map.schema.json",
+  "id": "shared_court",
+  "display_name": "Shared Court",
+  "description": "Open sandstone court with wool obstacles, shared by both minigames via tags. Exported once from authoring/shared_court.gen.json.",
+  "tags": [
+    "pvp",
+    "breakable",
+    "open"
+  ],
+  "players": {
+    "min": 3,
+    "max": 10
+  },
+  "size": [
+    27,
+    7,
+    27
+  ],
+  "source": {
+    "structure": "structures/shared_court.nbt"
+  },
+  "spawns": [
+    [
+      4,
+      1,
+      4
+    ],
+    [
+      22,
+      1,
+      22
+    ],
+    [
+      22,
+      1,
+      7
+    ],
+    [
+      4,
+      1,
+      19
+    ],
+    [
+      11,
+      1,
+      4
+    ],
+    [
+      22,
+      1,
+      14
+    ],
+    [
+      15,
+      1,
+      22
+    ],
+    [
+      4,
+      1,
+      12
+    ],
+    [
+      18,
+      1,
+      4
+    ],
+    [
+      8,
+      1,
+      22
+    ]
+  ],
+  "markers": [
+    {
+      "id": "center",
+      "type": "objective",
+      "pos": [
+        13,
+        1,
+        13
+      ]
+    }
+  ],
+  "needs_restore": true,
+  "tag_meta": {
+    "breakable": {
+      "breakable_blocks": [
+        "minecraft:white_wool",
+        "minecraft:orange_wool"
+      ]
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "../../../schemas/map.schema.json",
+  "id": "maze_rooms",
+  "display_name": "Maze Rooms",
+  "description": "3x3 rooms of mossy stone from the room_grid generator; blocks may be broken, so it is restored after each round.",
+  "tags": [
+    "breakable",
+    "maze"
+  ],
+  "players": {
+    "min": 4,
+    "max": 10
+  },
+  "source": {
+    "generator": "room_grid",
+    "seed": "maze-1",
+    "params": {
+      "grid": [
+        3,
+        3
+      ],
+      "room_size": [
+        7,
+        7
+      ],
+      "wall_height": 4,
+      "corridor_width": 3,
+      "corridor_length": 2,
+      "loop_chance": 0.25,
+      "palette": "mossy_maze"
+    }
+  },
+  "needs_restore": true
+}

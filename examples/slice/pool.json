@@ -1,0 +1,33 @@
+{
+  "$schema": "../../schemas/pool.schema.json",
+  "minigames": [
+    {
+      "id": "pvp_arena",
+      "weight": 1,
+      "presets": [
+        {
+          "id": "pvp_quick",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "block_brawl",
+      "weight": 1
+    }
+  ],
+  "maps": [
+    {
+      "id": "duel_pit",
+      "weight": 1
+    },
+    {
+      "id": "shared_court",
+      "weight": 1
+    },
+    {
+      "id": "maze_rooms",
+      "weight": 1
+    }
+  ]
+}

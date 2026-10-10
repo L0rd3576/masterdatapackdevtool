@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "map.schema.json",
+  "title": "Map manifest (maps/<id>.json)",
+  "type": "object",
+  "required": ["id", "display_name", "tags", "players", "source"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "id": {"$ref": "common.schema.json#/definitions/id"},
+    "display_name": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "default": ""},
+    "tags": {"$ref": "common.schema.json#/definitions/tag_list"},
+    "players": {"$ref": "common.schema.json#/definitions/player_range"},
+    "size": {"$ref": "common.schema.json#/definitions/size3", "description": "Expected size; checked against the generated/loaded model by the bounds validator."},
+    "source": {
+      "oneOf": [
+        {
+          "title": "structure source",
+          "type": "object", "required": ["structure"],
+          "properties": {"structure": {"type": "string", "pattern": "\\.nbt$", "description": "Structure file, relative to the project dir."}},
+          "additionalProperties": false
+        },
+        {
+          "title": "generator source",
+          "type": "object", "required": ["generator"],
+          "properties": {
+            "generator": {"type": "string", "pattern": "^[a-z0-9_]+$", "description": "Generator plugin name (tools/mapgen/generators/<name>.py)."},
+            "params": {"type": "object", "default": {}, "description": "Checked against the generator's PARAMS_SCHEMA."},
+            "seed": {"type": ["integer", "string"], "description": "Fixed seed; omitted = derived from the map id (config seed.mode)."}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "spawns": {
+      "type": "array", "items": {"$ref": "common.schema.json#/definitions/vec3i"},
+      "description": "Spawn cells (local x, y, z of the cell the player stands in). Omit to use the generator's spawns."
+    },
+    "spawn_rules": {
+      "type": "object",
+      "properties": {
+        "count": {"type": ["integer", "string"], "default": "max_players", "description": "How many spawns to keep: an integer or \"max_players\"."},
+        "min_spacing": {"type": "integer", "minimum": 0, "description": "Minimum distance between kept spawns (default: config spawns.min_spacing)."}
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "markers": {
+      "type": "array", "default": [],
+      "items": {
+        "type": "object", "required": ["id", "pos"],
+        "properties": {
+          "id": {"$ref": "common.schema.json#/definitions/id"},
+          "type": {"type": "string", "enum": ["objective", "other"], "default": "objective"},
+          "pos": {"$ref": "common.schema.json#/definitions/vec3i"},
+          "reachable": {"type": "boolean", "default": true, "description": "markers_reachable requires a walkable path from a spawn to the cell next to it."}
+        },
+        "additionalProperties": false
+      }
+    },
+    "needs_restore": {"type": "boolean", "default": false, "description": "Re-place the map after every round (blocks were changed)."},
+    "tag_meta": {"type": "object", "default": {}, "description": "Per-tag metadata (tag -> free-form object), copied to runtime storage maps.<id>.tag_meta."},
+    "validation": {"type": "object", "default": {}, "description": "Per-map validator overrides: validator name -> settings object, or false to skip it."}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "common.schema.json",
+  "title": "Shared definitions for the minigame/map data contract",
+  "definitions": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]{1,40}$",
+      "description": "Lowercase id (a-z 0-9 _): used as an NBT key, a function path segment and a structure name."
+    },
+    "tag": {"type": "string", "pattern": "^[a-z0-9_]{1,32}$"},
+    "tag_list": {"type": "array", "items": {"$ref": "#/definitions/tag"}, "uniqueItems": true},
+    "block_state": {
+      "type": "string",
+      "pattern": "^([a-z0-9_.-]+:)?[a-z0-9_./-]+(\\[[a-z0-9_]+=[a-z0-9_]+(,[a-z0-9_]+=[a-z0-9_]+)*\\])?$",
+      "description": "Block state, e.g. minecraft:oak_stairs[facing=east] (checked against generated/reports/blocks.json)."
+    },
+    "vec3i": {"type": "array", "items": {"type": "integer"}, "minItems": 3, "maxItems": 3},
+    "size3": {"type": "array", "items": {"type": "integer", "minimum": 1}, "minItems": 3, "maxItems": 3},
+    "player_range": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": {"type": "integer", "minimum": 1, "description": "Fewest participants supported."},
+        "max": {"type": "integer", "minimum": 1, "description": "Most participants supported."}
+      },
+      "additionalProperties": false
+    },
+    "weighted_block": {
+      "type": "object",
+      "required": ["block"],
+      "properties": {
+        "block": {"$ref": "#/definitions/block_state"},
+        "weight": {"type": "number", "minimum": 0, "default": 1}
+      },
+      "additionalProperties": false
+    },
+    "palette_ref": {
+      "description": "Name of a palette in tools/mapgen/config.json, or an inline object of role -> block (overrides the default palette).",
+      "oneOf": [
+        {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        {"type": "object", "additionalProperties": {
+          "oneOf": [{"$ref": "#/definitions/block_state"}, {"type": "array", "items": {"$ref": "#/definitions/weighted_block"}}]
+        }}
+      ]
+    }
+  }
+}
