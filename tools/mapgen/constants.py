@@ -8,7 +8,7 @@ DATA_VERSION = 5023
 
 # [V] structure file keys in 26.3 vanilla files: size, entities, blocks, palette (or palettes), DataVersion;
 # palette entries are {id, properties} (NOT the pre-26 Name/Properties); blocks are {pos, state, nbt?};
-# entities are {pos (doubles), blockPos (ints), nbt}. Checked over all vanilla structures (tools/mapgen/README).
+# entities are {pos (doubles), blockPos (ints), nbt}. Checked over all vanilla structures (knowledge/mapgen.md).
 PALETTE_ID_KEY = "id"
 PALETTE_PROPS_KEY = "properties"
 

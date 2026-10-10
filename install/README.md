@@ -11,3 +11,11 @@ Copy-Item "C:\Users\lrafy\mc-datapack-tools\install\skills\datapack-workflow\SKI
 New-Item -ItemType Directory -Force "C:\Users\lrafy\mc-datapack-tools\.claude\skills\function-library" | Out-Null
 Copy-Item "C:\Users\lrafy\mc-datapack-tools\install\skills\function-library\SKILL.md" "C:\Users\lrafy\mc-datapack-tools\.claude\skills\function-library\"
 ```
+
+## Map/framework skills (added 2026-10-10, same reason)
+```powershell
+foreach ($s in "map-authoring","minigame-manifest","generator-plugin") {
+  New-Item -ItemType Directory -Force "C:\Users\lrafy\mc-datapack-tools\.claude\skills\$s" | Out-Null
+  Copy-Item "C:\Users\lrafy\mc-datapack-tools\install\skills\$s\SKILL.md" "C:\Users\lrafy\mc-datapack-tools\.claude\skills\$s\"
+}
+```

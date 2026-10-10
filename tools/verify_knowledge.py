@@ -59,6 +59,39 @@ def version_json():
 
 
 V = version_json()
+
+
+def vanilla_structures_ok():
+    """Every vanilla structure: DataVersion 5023, palette entries keyed id/properties (not Name/Properties)."""
+    sys.path.insert(0, os.path.join(ROOT, "tools", "mapgen"))
+    import nbt
+    n = 0
+    for d, _, fs in os.walk(os.path.join(VAN, "structure")):
+        for f in fs:
+            if not f.endswith(".nbt"):
+                continue
+            root = nbt.to_plain(nbt.read_file(os.path.join(d, f)))
+            pals = root.get("palettes") or [root.get("palette", [])]
+            if root["DataVersion"] != 5023 or any("Name" in e or "id" not in e for p in pals for e in p):
+                return False
+            n += 1
+    return n > 1000
+
+
+def mapgen_config_blocks_exist():
+    """Every exact block id in tools/mapgen/config.json (palettes + block classes) is a 26.3 block."""
+    cfg = j(ROOT, "tools", "mapgen", "config.json")
+    ids = set()
+    for pal in cfg["palettes"].values():
+        for v in pal.values():
+            for e in (v if isinstance(v, list) else [v]):
+                b = e["block"] if isinstance(e, dict) else e
+                if isinstance(b, str) and b.startswith("minecraft:"):
+                    ids.add(b.split("[")[0])
+    for lst in cfg["blocks"].values():
+        if isinstance(lst, list):
+            ids |= {b for b in lst if "*" not in b}
+    return ids and all(b.split(":", 1)[1] in REGS["block"] for b in ids)
 CLAIMS = [
     ("pack-format.md", "26.3 data pack format is 121.0", lambda: (V["pack_version"]["data_major"], V["pack_version"]["data_minor"]) == (121, 0)),
     ("pack-format.md", "26.3 resource pack format is 97.1", lambda: (V["pack_version"]["resource_major"], V["pack_version"]["resource_minor"]) == (97, 1)),
@@ -97,6 +130,17 @@ CLAIMS = [
     ("advancements.md", "trigger types tick, using_item, inventory_changed, impossible exist", lambda: {"tick", "using_item", "inventory_changed", "impossible"} <= REGS["trigger_type"]),
     ("advancements.md", "vanilla root advancements (no parent, with display) all have a background", lambda: all("background" in a["display"] for a in (j(d, f) for d, _, fs in os.walk(os.path.join(VAN, "advancement")) for f in fs) if "parent" not in a and "display" in a)),
     ("datapack-structure.md", "tags exist for function, block, item, entity_type, damage_type, enchantment", lambda: all(DP["registries"].get("minecraft:" + r, {}).get("tags") for r in ("block", "item", "entity_type", "damage_type", "enchantment")) and DP["others"]["function"]["tags"]),
+    # mapgen / framework (knowledge/mapgen.md, knowledge/framework-contract.md)
+    ("mapgen.md", "all vanilla structures: DataVersion 5023, palette entries {id, properties}", vanilla_structures_ok),
+    ("mapgen.md", "overworld dimension_type min_y -64, height 384 (constants.py)", lambda: (lambda d: (d["min_y"], d["height"]) == (-64, 384))(j(VAN, "dimension_type", "overworld.json"))),
+    ("mapgen.md", "'place template', 'forceload add' and 'schedule function' exist", lambda: cmd("place", "template") and cmd("forceload", "add") and cmd("schedule", "function")),
+    ("mapgen.md", "no vanilla fake-player command: no 'player' root command", lambda: not cmd("player")),
+    ("mapgen.md", "'dimension' is a datapack folder; biome the_void exists", lambda: "dimension" in FOLDERS and "the_void" in REGS.get("worldgen/biome", set()) | {f[:-5] for f in os.listdir(os.path.join(VAN, "worldgen", "biome"))}),
+    ("mapgen.md", "flat world_preset generator: type minecraft:flat, settings biome/features/lakes/layers", lambda: (lambda g: g["type"] == "minecraft:flat" and {"biome", "features", "lakes", "layers"} <= set(g["settings"]))(j(VAN, "worldgen", "world_preset", "flat.json")["dimensions"]["minecraft:overworld"]["generator"])),
+    ("mapgen.md", "attributes step_height, jump_strength, gravity, safe_fall_distance exist", lambda: {"step_height", "jump_strength", "gravity", "safe_fall_distance"} <= REGS["attribute"]),
+    ("framework-contract.md", "entity types text_display, armor_stand, marker exist (labels, test stand-ins)", lambda: {"text_display", "armor_stand", "marker"} <= REGS["entity_type"]),
+    ("framework-contract.md", "statistic 'minecraft.mined' criteria type exists (block_brawl wool counters)", lambda: "mined" in REGS["stat_type"]),
+    ("mapgen.md", "every exact block id in tools/mapgen/config.json is a 26.3 block", mapgen_config_blocks_exist),
 ]
 
 

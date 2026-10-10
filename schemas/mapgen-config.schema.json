@@ -118,7 +118,8 @@
       "properties": {
         "origin": {"$ref": "common.schema.json#/definitions/vec3i"},
         "spacing": {"type": "integer", "minimum": 1},
-        "label_height": {"type": "integer"}
+        "label_height": {"type": "integer"},
+        "place_delay_ticks": {"type": "integer", "minimum": 1, "description": "ticks between forceload and placing maps/labels (entity sections must load first)"}
       },
       "additionalProperties": false
     }

@@ -5,6 +5,9 @@
       "run": "function slice:gallery/build"
     },
     {
+      "ticks": 21
+    },
+    {
       "assert": "in slice:arena if block 0 64 4096 minecraft:smooth_stone"
     },
     {

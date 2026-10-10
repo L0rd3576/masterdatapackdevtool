@@ -22,6 +22,11 @@ Never state an unverified syntax as fact. If you cannot verify it, say so and lo
 | `python tools/test_library.py` | Whole library suite: header/INDEX check, lint, server tests |
 | `python tools/gen_library_index.py` | Regenerate `library/INDEX.md` from function headers (fails on a missing header) |
 | `python tools/probe.py [--pack D] cmd...` | Research: boot a server, print raw responses to commands |
+| `python tools/build_pack.py <project>` | Validate a minigame/map framework project (manifests in `minigames/ maps/ presets/ pool.json`) and compile it to a datapack |
+| `python tools/mapgen/validate.py <project> [--maps]` | Schema + cross-ref check of all manifests (`--kind map <f>` for one file, `--config`) |
+| `python tools/mapgen/report.py <maps/x.json>\|--project D` | Generate, run all map validators incl. real-server load, render PNG/ASCII to `build/mapgen/` |
+| `python tools/mapgen/generate.py\|render.py\|gallery.py` | Single steps: .nbt + meta (`--hash`), renders, walk-through gallery (`--check`) |
+| `python tools/mapgen/selftest_failures.py` | 3 broken fixtures (missing key, unreachable spawn, nondeterministic generator) must fail |
 Test file format and test-world facts: `knowledge/testing.md`. A server boot takes about 7 s.
 
 ## Workflow for every task (mandatory)
@@ -79,5 +84,11 @@ This is how you get better over time; nothing is retrained, so the learning live
 - `knowledge/pitfalls.md` 42 verified mistakes and which ones are silent
 - `knowledge/testing.md` test file format, test world, harness self-checks
 - `knowledge/lessons.md` running lessons; `knowledge/UNVERIFIED.md` open questions; `knowledge/_research/` raw wiki notes
-- `.claude/skills/` skills learned over time; `template-datapack/` valid starter pack with a test
+- `knowledge/mapgen.md` structure format, size limits, placement, arena dimension, movement values, fake players
+- `knowledge/framework-contract.md` minigame/map/preset/pool manifests, defaults, what build_pack emits, round flow
+- `knowledge/map-style.md` approved map aesthetic (read before authoring maps)
+- `schemas/` JSON schemas for every manifest + `tools/mapgen/config.json`; `examples/slice/` working framework project
+- `tools/mapgen/` generators/ + validators/ are plugins (add a file, never edit core); `tools/framework/pack/` round logic
+- `.claude/skills/` skills learned over time (map-authoring, minigame-manifest, generator-plugin are in
+  `install/skills/` until copied, see `install/README.md`); `template-datapack/` valid starter pack with a test
 - `claude-code-prompt.md` the bootstrap prompt that built all of the above

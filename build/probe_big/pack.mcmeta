@@ -1,0 +1,7 @@
+{
+  "pack": {
+    "description": "Vertical slice: 2 minigames, 3 maps (built by tools/build_pack.py)",
+    "min_format": 121,
+    "max_format": 121
+  }
+}

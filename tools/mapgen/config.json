@@ -165,6 +165,7 @@
   "gallery": {
     "origin": [0, 64, 4096],
     "spacing": 16,
-    "label_height": 3
+    "label_height": 3,
+    "place_delay_ticks": 20
   }
 }

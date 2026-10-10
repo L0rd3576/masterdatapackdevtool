@@ -1,0 +1,8 @@
+{
+  "id": "nondeterministic",
+  "display_name": "Broken: generator ignores the seed",
+  "tags": ["pvp"],
+  "players": {"min": 2, "max": 2},
+  "size": [9, 4, 9],
+  "source": {"generator": "selftest_nondeterministic", "seed": 1, "params": {}}
+}

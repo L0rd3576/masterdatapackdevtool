@@ -1,0 +1,8 @@
+{
+  "id": "unreachable_spawn",
+  "display_name": "Broken: spawn #1 is sealed inside a walled cell",
+  "tags": ["pvp"],
+  "players": {"min": 2, "max": 2},
+  "size": [11, 5, 11],
+  "source": {"generator": "selftest_sealed_cell", "seed": 1, "params": {}}
+}

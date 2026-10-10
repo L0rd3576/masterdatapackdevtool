@@ -111,7 +111,7 @@
       }
     },
     {
-      "assert": "entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"
+      "assert": "if entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"
     },
     {
       "assert_score": {

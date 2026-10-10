@@ -45,7 +45,7 @@
       }
     },
     {
-      "assert": "entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"
+      "assert": "if entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"
     },
     {
       "run": "kill @e[tag=t.p,limit=7]"
@@ -99,7 +99,7 @@
       }
     },
     {
-      "assert": "data storage slice:round {last_error:\"no minigame/map fits the participant count\"}"
+      "assert": "if data storage slice:round {last_error:\"no minigame/map fits the participant count\"}"
     },
     {
       "assert_score": {

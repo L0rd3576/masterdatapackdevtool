@@ -62,7 +62,7 @@ w("b_pvp_round.test.json", {
         {"assert_output": {"command": "execute if entity @e[tag=t.p,scores={slice.coins=2}]", "contains": "Count: 3"}},
         {"assert_output": {"command": "execute positioned 0 -60 2 if entity @e[tag=t.p,dx=8,dy=1,dz=0]", "contains": "Count: 4"}},
         {"assert_output": {"command": "gamerule keep_inventory", "contains": "false"}},
-        {"assert": "entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"},
+        {"assert": "if entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"},
         {"assert_score": {"target": "#placed.duel_pit", "objective": "slice.round", "equals": 1}},
     ],
     "teardown": CLEAN})
@@ -105,7 +105,7 @@ w("d_random_select.test.json", {
         {"run": "function slice:round/abort"},
         {"ticks": 4},
         {"assert_score": {"target": "#state", "objective": "slice.round", "equals": 0}},
-        {"assert": "entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"},
+        {"assert": "if entity @e[tag=t.p] unless entity @e[tag=slice.in_round]"},
         {"run": "kill @e[tag=t.p,limit=7]"},
         {"run": "execute as @e[tag=t.p] run function slice:queue/join"},
         {"run": "function slice:round/start"},
@@ -119,7 +119,7 @@ w("d_random_select.test.json", {
         {"run": "execute as @e[tag=t.p] run function slice:queue/join"},
         {"run": "execute store success score #ok t.s run function slice:round/start"},
         {"assert_score": {"target": "#ok", "objective": "t.s", "equals": 0}},
-        {"assert": 'data storage slice:round {last_error:"no minigame/map fits the participant count"}'},
+        {"assert": 'if data storage slice:round {last_error:"no minigame/map fits the participant count"}'},
         {"assert_score": {"target": "#state", "objective": "slice.round", "equals": 0}},
     ],
     "teardown": CLEAN})
@@ -147,7 +147,8 @@ w("f_gallery.test.json", {
     "description": "gallery/build places every pool map side by side in the arena dimension with 3 labels each",
     "steps": [
         {"run": "function slice:gallery/build"},
-        {"assert": "in slice:arena if block 0 64 4096 minecraft:smooth_stone"},
+        {"ticks": 21},
+        {"assert":"in slice:arena if block 0 64 4096 minecraft:smooth_stone"},
         {"assert_output": {"command": "execute if entity @e[type=minecraft:text_display,tag=slice.gallery]", "contains": "Count: 9"}},
     ]})
 print("wrote tests")

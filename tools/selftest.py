@@ -52,6 +52,9 @@ def main(argv):
     code, out = run([os.path.join(ROOT, "tools", "gen_library_index.py"), "--check"])
     bad += code != 0
     print(f"[{'ok ' if code == 0 else 'BAD'}] index     library headers + INDEX.md up to date | {out.strip().splitlines()[-1]}")
+    code, out = run([os.path.join(ROOT, "tools", "mapgen", "selftest_failures.py")])
+    bad += code != 0
+    print(f"[{'ok ' if code == 0 else 'BAD'}] mapgen    3 broken fixtures rejected by their check | {out.strip().splitlines()[-1]}")
     for pack, (lint_ok, tests_ok, why) in CASES.items():
         name = os.path.basename(pack)
         code, out = run([os.path.join(ROOT, "tools", "lint_datapack.py"), pack])

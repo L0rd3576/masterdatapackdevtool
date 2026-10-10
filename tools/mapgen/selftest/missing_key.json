@@ -1,0 +1,6 @@
+{
+  "id": "missing_key",
+  "display_name": "Broken: no players block",
+  "tags": ["pvp"],
+  "source": {"generator": "static_arena", "seed": 1, "params": {"size": [15, 7, 15]}}
+}
