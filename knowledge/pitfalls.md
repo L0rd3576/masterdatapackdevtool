@@ -60,3 +60,5 @@ marked [lint]; the test runner catches the rest only if a test exercises the beh
 ## Test environment
 41. 26.3 servers pause when empty after 60 s (`pause-when-empty-seconds`) - the test template sets 0.
 42. No spawn chunks since 1.21.9 - forceload what you need (the runner forceloads -32..31).
+43. `item replace` with a multi-slot source (`weapon.*`, a slot_source file) changes only the first slot; use `item fill` for all.
+44. A UUID int array `[I;1,2,3,4]` is NOT `00000001-0002-0003-0000-000000000004`; target test entities by tag selectors instead.

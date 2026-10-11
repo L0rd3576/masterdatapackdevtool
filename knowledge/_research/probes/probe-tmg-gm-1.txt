@@ -1,0 +1,154 @@
+> scoreboard objectives add p.c dummy
+  Created new objective [p.c]   [1 ms]
+> scoreboard objectives add p.d minecraft.dropped:minecraft.emerald
+  Created new objective [p.d]   [1 ms]
+> advancement grant @a only p:use_obj
+  No player was found   [1 ms]
+> summon minecraft:armor_stand 0 -60 0 {Tags:["s"],NoGravity:1b}
+  Summoned new Armor Stand   [20 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start"}},item_name={text:"Start Game",color:"green"},consumable={consume_seconds:1000000.0f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false},use_effects={can_sprint:true,speed_multiplier:1.0f,interact_vibrations:false},max_stack_size=1,enchantments={"minecraft:vanishing_curse":1},enchantment_glint_override=false,tooltip_display={hidden_components:["minecraft:enchantments"]}]
+  Replaced 1 slot(s) on Armor Stand with [Start Game]   [13 ms]
+> data get entity @n[tag=s] equipment.mainhand
+  Armor Stand has the following entity data: {components: {"minecraft:item_name": {color: "green", text: "Start Game"}, "minecraft:use_effects": {interact_vibrations: 0b, speed_multiplier: 1.0f, can_sprint: 1b}, "minecraft:max_stack_size": 1, "minecraft:enchantments": {"minecraft:vanishing_curse": 1}, "minecraft:tooltip_display": {hidden_components: ["minecraft:enchantments"]}, "minecraft:enchantment_glint_override": 0b, "minecraft:custom_data": {tmg_gm: {key: "start"}}, "minecraft:consumable": {sound: "minecraft:intentionally_empty", consume_seconds: 1000000.0f, has_consume_particles: 0b, animation: "none"}}, count: 1, id: "minecraft:emerald"}   [10 ms]
+> item replace entity @n[tag=s] weapon.offhand with minecraft:breeze_rod[custom_data={can_dash:1b},consumable={consume_seconds:9999999},use_effects={speed_multiplier:1,can_sprint:true}]
+  Replaced 1 slot(s) on Armor Stand with [Breeze Rod]   [2 ms]
+> data get entity @n[tag=s] equipment.offhand
+  Armor Stand has the following entity data: {components: {"minecraft:use_effects": {speed_multiplier: 1.0f, can_sprint: 1b}, "minecraft:custom_data": {can_dash: 1b}, "minecraft:consumable": {consume_seconds: 9999999.0f}}, count: 1, id: "minecraft:breeze_rod"}   [2 ms]
+> item replace entity @n[tag=s] armor.head with minecraft:emerald[consumable={consume_seconds:2147483647f}]
+  Replaced 1 slot(s) on Armor Stand with [Emerald]   [1 ms]
+> item replace entity @n[tag=s] armor.head with minecraft:emerald[consumable={animation:"nonee"}]
+  Malformed 'minecraft:consumable' component: 'Unknown element name:nonee'...onsumable={animation:"nonee"}]<--[HERE]   [2 ms]
+> item replace entity @n[tag=s] armor.head with minecraft:emerald[use_effects={speed_multiplier:1.5f}]
+  Malformed 'minecraft:use_effects' component: 'Value 1.5 outside of range [0.0:1.0]'...e_effects={speed_multiplier:1.5f}]<--[HERE]   [1 ms]
+> item replace entity @n[tag=s] armor.head with minecraft:emerald[creative_slot_lock={}]
+  Unknown item component 'minecraft:creative_slot_lock'...t:emerald[creative_slot_lock={}]<--[HERE]   [1 ms]
+> data get entity @n[tag=s] equipment.head
+  Armor Stand has the following entity data: {components: {"minecraft:consumable": {consume_seconds: 2.1474836E9f}}, count: 1, id: "minecraft:emerald"}   [2 ms]
+> execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{key:"start"}}]
+  Test passed. Count: 1   [2 ms]
+> execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{}}]
+  Test passed. Count: 1   [1 ms]
+> execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{key:"cancel"}}]
+  Test failed   [1 ms]
+> execute store result score #c p.c if items entity @n[tag=s] weapon.* *
+  Test passed. Count: 2   [3 ms]
+> scoreboard players get #c p.c
+  #c has 2 [p.c]   [1 ms]
+> execute if items entity @n[tag=s] player.cursor *
+  Test failed   [1 ms]
+> execute if items entity @n[tag=s] container.* *
+  Test failed   [1 ms]
+> execute if items entity @n[tag=s] hotbar.4 *
+  Test failed   [1 ms]
+> execute if items entity @n[tag=s] player.crafting.* *
+  Test failed   [1 ms]
+> execute if items entity @n[tag=s] enderchest.* *
+  Test failed   [1 ms]
+> execute as @n[tag=s] run clear @s *
+     [1 ms]
+> execute if items entity @n[tag=s] p:a *
+  Test passed. Count: 2   [2 ms]
+> execute if items entity @n[tag=s] p:b *
+  Test passed. Count: 1   [1 ms]
+> execute if items entity @n[tag=s] p:c *
+  Test passed. Count: 3   [1 ms]
+> execute if slots entity @n[tag=s] p:b
+  Test passed. Count: 1   [1 ms]
+> execute store result score #c p.c if items entity @n[tag=s] p:b *
+  Test passed. Count: 1   [1 ms]
+> scoreboard players get #c p.c
+  #c has 1 [p.c]   [0 ms]
+> item replace entity @n[tag=s] p:b with minecraft:air
+  Replaced 1 slot(s) on Armor Stand with [Air]   [1 ms]
+> data get entity @n[tag=s] equipment
+  Armor Stand has the following entity data: {head: {components: {"minecraft:consumable": {consume_seconds: 2.1474836E9f}}, count: 1, id: "minecraft:emerald"}, offhand: {components: {"minecraft:use_effects": {speed_multiplier: 1.0f, can_sprint: 1b}, "minecraft:custom_data": {can_dash: 1b}, "minecraft:consumable": {consume_seconds: 9999999.0f}}, count: 1, id: "minecraft:breeze_rod"}}   [1 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start"}}]
+  Replaced 1 slot(s) on Armor Stand with [Emerald]   [1 ms]
+> summon minecraft:item 2 -60 0 {Tags:["it"],Item:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"start"}}}}}
+  Summoned new Emerald   [2 ms]
+> summon minecraft:item 3 -60 0 {Tags:["it2"],Item:{id:"minecraft:emerald",count:1}}
+  Summoned new Emerald   [1 ms]
+> execute as @e[type=minecraft:item] if items entity @s contents *[custom_data~{tmg_gm:{}}] run kill @s
+  Killed Emerald   [4 ms]
+> execute if entity @e[type=minecraft:item,tag=it]
+  Test failed   [0 ms]
+> execute if entity @e[type=minecraft:item,tag=it2]
+  Test passed. Count: 1   [0 ms]
+> summon minecraft:item 4 -60 0 {Tags:["ev"],Item:{id:"minecraft:stone",count:1},PickupDelay:0s}
+  Summoned new Stone   [1 ms]
+> item replace entity @n[tag=ev] contents from entity @n[tag=s] weapon.offhand
+  Replaced 1 slot(s) on Breeze Rod   [1 ms]
+> data get entity @n[tag=ev] Item
+  Breeze Rod has the following entity data: {components: {"minecraft:use_effects": {speed_multiplier: 1.0f, can_sprint: 1b}, "minecraft:custom_data": {can_dash: 1b}, "minecraft:consumable": {consume_seconds: 9999999.0f}}, count: 1, id: "minecraft:breeze_rod"}   [1 ms]
+> item replace entity @n[tag=s] weapon.offhand with minecraft:air
+  Replaced 1 slot(s) on Armor Stand with [Air]   [1 ms]
+> data get entity @n[tag=s] equipment
+  Armor Stand has the following entity data: {mainhand: {components: {"minecraft:custom_data": {tmg_gm: {key: "start"}}}, count: 1, id: "minecraft:emerald"}, head: {components: {"minecraft:consumable": {consume_seconds: 2.1474836E9f}}, count: 1, id: "minecraft:emerald"}}   [1 ms]
+> summon minecraft:zombie 10 -60 0 {Tags:["z1"],NoAI:1b,PersistenceRequired:1b,equipment:{mainhand:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"z1"}},"minecraft:enchantments":{"minecraft:vanishing_curse":1}}}},drop_chances:{mainhand:2.0f}}
+  Summoned new Zombie   [10 ms]
+> summon minecraft:zombie 12 -60 0 {Tags:["z2"],NoAI:1b,PersistenceRequired:1b,equipment:{mainhand:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"z2"}}}}},drop_chances:{mainhand:2.0f}}
+  Summoned new Zombie   [2 ms]
+> data get entity @n[tag=z1] drop_chances
+  Zombie has the following entity data: {mainhand: 2.0f}   [2 ms]
+> kill @e[tag=z1]
+  Killed Zombie   [8 ms]
+> kill @e[tag=z2]
+  Killed Zombie   [1 ms]
+> @ticks 2
+  (stepped 2 ticks in 0.10s)
+> execute store result score #z1 p.c if entity @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{tmg_gm:{key:"z1"}}}}}]
+  Test failed   [2 ms]
+> execute store result score #z2 p.c if entity @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{tmg_gm:{key:"z2"}}}}}]
+  Test passed. Count: 1   [1 ms]
+> scoreboard players get #z1 p.c
+  #z1 has 0 [p.c]   [0 ms]
+> scoreboard players get #z2 p.c
+  #z2 has 1 [p.c]   [0 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start",alt:1b}},item_name={text:"Cancel",color:"red"}]
+  Replaced 1 slot(s) on Armor Stand with [Cancel]   [1 ms]
+> data get entity @n[tag=s] equipment.mainhand.components
+  Armor Stand has the following entity data: {"minecraft:item_name": {color: "red", text: "Cancel"}, "minecraft:custom_data": {tmg_gm: {alt: 1b, key: "start"}}}   [1 ms]
+> execute positioned 20 -60 20 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b,equipment:{mainhand:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"start"}}}}}}
+  Summoned new Armor Stand   [2 ms]
+> execute positioned 20 -60 21 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute positioned 20 -60 22 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute positioned 20 -60 23 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute positioned 20 -60 24 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute positioned 21 -60 20 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute positioned 21 -60 21 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute positioned 21 -60 22 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute positioned 21 -60 23 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute positioned 21 -60 24 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> item replace entity @e[tag=g] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start"}}]
+  Replaced slot(s) on 10 entities with [Emerald]   [1 ms]
+> execute positioned 30 -60 30 run summon minecraft:item ~ ~ ~ {Item:{id:"minecraft:dirt",count:1},Age:-32768s,PickupDelay:32767s}
+  Summoned new Dirt   [2 ms]
+> execute as @e[type=minecraft:item,limit=1] at @s run function p:dup49
+  Running function p:dup49   [9 ms]
+> @ticks 100
+  (stepped 100 ticks in 5.03s)
+> tick query
+  The game is frozenTarget tick rate: 20.0 per second.
+Average time per tick: 2.1ms (Target: 50.0ms)Percentiles: P50: 1.5ms P95: 7.3ms P99: 9.2ms. Sample: 100   [1 ms]
+> scoreboard players set #bench p.c 1
+  Set [p.c] for #bench to 1   [1 ms]
+> @ticks 100
+  (stepped 100 ticks in 5.00s)
+> tick query
+  The game is frozenTarget tick rate: 20.0 per second.
+Average time per tick: 8.4ms (Target: 50.0ms)Percentiles: P50: 6.5ms P95: 21.8ms P99: 34.5ms. Sample: 100   [1 ms]
+> scoreboard players get #miss p.c
+  Can't get value of p.c for #miss; none is set   [0 ms]
+> execute store result score #ni p.c if entity @e[type=minecraft:item]
+  Test passed. Count: 54   [1 ms]
+> scoreboard players get #ni p.c
+  #ni has 54 [p.c]   [0 ms]

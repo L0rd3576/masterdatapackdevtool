@@ -1,0 +1,1 @@
+{"criteria":{"i":{"trigger":"minecraft:inventory_changed","conditions":{"items":[{"predicates":{"minecraft:custom_data":{"tmg_gm":{}}}}]}}},"rewards":{"function":"p:r_use"}}

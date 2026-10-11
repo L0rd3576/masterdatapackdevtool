@@ -1,0 +1,15 @@
+# Probe 2026-10-11 #3: item replace vs item fill on multi-slot sources; selector macro target
+scoreboard objectives add p.c dummy
+summon minecraft:armor_stand 0 -60 0 {Tags:["s"],NoGravity:1b}
+item replace entity @n[tag=s] weapon.* with minecraft:stone
+data get entity @n[tag=s] equipment
+item replace entity @n[tag=s] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start",v:"main"}}]
+item replace entity @n[tag=s] weapon.offhand with minecraft:emerald[custom_data={tmg_gm:{key:"start",v:"main"}}]
+item replace entity @n[tag=s] armor.head with minecraft:emerald[custom_data={tmg_gm:{key:"other",v:"main"}}]
+item replace entity @n[tag=s] armor.feet with minecraft:dirt
+item fill entity @n[tag=s] p:gm_mob with minecraft:air
+data get entity @n[tag=s] equipment
+item fill entity @n[tag=s] p:gm_mob with minecraft:air
+execute as @n[tag=s] run tag @s add viasel
+execute as @n[tag=s] if entity @s[type=minecraft:player] run say player
+execute store result score #c p.c if entity @n[tag=s]

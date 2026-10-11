@@ -1,0 +1,28 @@
+> scoreboard objectives add p.c dummy
+  Created new objective [p.c]   [1 ms]
+> summon minecraft:armor_stand 0 -60 0 {Tags:["s"],NoGravity:1b}
+  Summoned new Armor Stand   [18 ms]
+> item replace entity @n[tag=s] weapon.* with minecraft:stone
+  Replaced 1 slot(s) on Armor Stand with [Stone]   [7 ms]
+> data get entity @n[tag=s] equipment
+  Armor Stand has the following entity data: {mainhand: {count: 1, id: "minecraft:stone"}}   [8 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start",v:"main"}}]
+  Replaced 1 slot(s) on Armor Stand with [Emerald]   [3 ms]
+> item replace entity @n[tag=s] weapon.offhand with minecraft:emerald[custom_data={tmg_gm:{key:"start",v:"main"}}]
+  Replaced 1 slot(s) on Armor Stand with [Emerald]   [1 ms]
+> item replace entity @n[tag=s] armor.head with minecraft:emerald[custom_data={tmg_gm:{key:"other",v:"main"}}]
+  Replaced 1 slot(s) on Armor Stand with [Emerald]   [1 ms]
+> item replace entity @n[tag=s] armor.feet with minecraft:dirt
+  No targets accepted item 1 minecraft:dirt into specified slots   [1 ms]
+> item fill entity @n[tag=s] p:gm_mob with minecraft:air
+  Replaced 3 slot(s) on Armor Stand with [Air]   [2 ms]
+> data get entity @n[tag=s] equipment
+  Found no elements matching equipment   [1 ms]
+> item fill entity @n[tag=s] p:gm_mob with minecraft:air
+  The target does not have slot p:gm_mob   [1 ms]
+> execute as @n[tag=s] run tag @s add viasel
+  Added tag 'viasel' to Armor Stand   [1 ms]
+> execute as @n[tag=s] if entity @s[type=minecraft:player] run say player
+     [1 ms]
+> execute store result score #c p.c if entity @n[tag=s]
+  Test passed. Count: 1   [2 ms]

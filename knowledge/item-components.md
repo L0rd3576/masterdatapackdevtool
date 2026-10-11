@@ -64,3 +64,27 @@ BAD (server message):
   (`Value 0 outside of range [1:255]`). Vanilla `enchantment/knockback.json`: effect `minecraft:knockback` add linear
   base 1 per level, slot `mainhand`, no tool condition (`supported_items` only gates enchanting/anvils), `max_level` 2
   (survival cap only). In-game knockback of a stick needs a real player (unverified).
+
+## Right-click items, slot sources, item protection (probe 2026-10-11, `_research/probes/probe-tmg-gm-1..3.txt`, pack `tmg-gm-pack`)
+- [V] Accepted and stored as written: `minecraft:emerald[custom_data={tmg_gm:{key:"start",v:"main"}},item_name={text:"Start Game",color:"green",italic:false},
+  consumable={consume_seconds:1000000.0f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false},
+  use_effects={can_sprint:true,speed_multiplier:1.0f,interact_vibrations:false},max_stack_size=1,
+  enchantments={"minecraft:vanishing_curse":1},enchantment_glint_override=false,tooltip_display={hidden_components:["minecraft:enchantments"]}]`.
+  `use_effects` fields = can_sprint, speed_multiplier (range 0.0-1.0; 1.5 rejected), interact_vibrations (vanilla `copper_spear` report).
+  Old forms `consume_seconds:9999999` (int) and `speed_multiplier:1` are coerced to float. `animation:"nonee"` -> `Unknown element name`.
+  `consume_seconds:2147483647f` is accepted. `creative_slot_lock` is in the registry but `Unknown item component` in commands.
+- [V] No component prevents dropping or moving an item. `vanishing_curse` (effect `prevent_equipment_drop`) on ANY item:
+  a zombie with drop chance 2.0 dropped the plain marked emerald but not the cursed one.
+- [V] `custom_data~{tmg_gm:{}}` matches any item whose custom_data has a `tmg_gm` compound; `~{tmg_gm:{key:"start",v:"alt"}}` is exact per field.
+  `execute if items` prints/stores the number of matching items (`Count: 2`).
+- [V] Slot sources from files `data/<ns>/slot_source/<id>.json`, referenced as `<ns>:<id>` wherever a slot is expected:
+  `{"type":"minecraft:filtered","slot_source":{"type":"minecraft:group","terms":[{"type":"minecraft:slot_range","slots":"weapon.*"},...]},
+  "item_filter":{"predicates":{"minecraft:custom_data":{"tmg_gm":{}}}}}` (also plain `slot_range`). Slot names
+  `player.cursor`, `player.crafting.*`, `enderchest.*`, `contents` parse (on players: unverified at runtime).
+- [V] `item replace` with a multi-slot source changes ONLY ONE slot (`Replaced 1 slot(s)`); `item fill entity @s <ns>:<filtered> with minecraft:air`
+  clears every matching slot (`Replaced 3 slot(s)`); with no match: `The target does not have slot <id>` (a failure, not an error).
+- [V] Item entities / frames: `execute as @e[type=minecraft:item] if items entity @s contents *[custom_data~{tmg_gm:{}}] run kill @s`;
+  `item replace entity <item entity> contents from entity <e> <slot>` moves a stack into a summoned item entity (eviction);
+  an item frame's item is cleared by `item fill ... contents` via a filtered source. Summoning an item frame in air logs
+  `ERROR Block-attached entity at invalid position` (fails a test).
+- [V] Cost: 100 x (10 armor stands x 2 `if items` checks + scan of 54 item entities) per tick = +6.3 ms -> ~0.06 ms per pass.

@@ -1,0 +1,59 @@
+# Probe 2026-10-11 #2: GM slot sources, eviction, uuid targeting, debounce math. Pack: tmg-gm-pack
+scoreboard objectives add p.c dummy
+scoreboard objectives add p.last dummy
+summon minecraft:armor_stand 0 -60 0 {Tags:["s"],NoGravity:1b,UUID:[I;1,2,3,4]}
+# uuid string targets a non-player
+execute as 00000001-0002-0003-0000-000000000004 run tag @s add viauuid
+execute if entity @e[tag=viauuid]
+execute store result score #c p.c if entity 00000001-0002-0003-0000-000000000004
+# macro give with alt variant + eviction of a non-GM item
+item replace entity @n[tag=s] weapon.mainhand with minecraft:diamond 3
+execute as @n[tag=s] at @s run function p:give {slot:"weapon.mainhand",id:"minecraft:emerald",key:"start",v:"main",name:"Start Game",color:"green"}
+data get entity @n[tag=s] equipment.mainhand.components."minecraft:custom_data"
+data get entity @n[type=minecraft:item,tag=p.evdone] Item
+execute as @n[tag=s] at @s run function p:give {slot:"weapon.mainhand",id:"minecraft:redstone",key:"start",v:"alt",name:"Cancel",color:"red"}
+data get entity @n[tag=s] equipment.mainhand
+execute if entity @e[type=minecraft:item,tag=p.evdone,limit=2]
+execute store result score #ev p.c if entity @e[type=minecraft:item,tag=p.evdone]
+# variant-aware slot check
+execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{key:"start",v:"alt"}}]
+execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{key:"start",v:"main"}}]
+# mob slot source: count, strip, empty strip
+item replace entity @n[tag=s] weapon.offhand with minecraft:emerald[custom_data={tmg_gm:{key:"start",v:"main"}}]
+item replace entity @n[tag=s] armor.head with minecraft:emerald[custom_data={tmg_gm:{key:"other",v:"main"}}]
+execute if items entity @n[tag=s] p:gm_mob *
+execute if items entity @n[tag=s] p:gm_mob *[custom_data~{tmg_gm:{key:"start"}}]
+execute if items entity @n[tag=s] p:gm_all *
+item replace entity @n[tag=s] p:gm_mob with minecraft:air
+item replace entity @n[tag=s] p:gm_mob with minecraft:air
+data get entity @n[tag=s] equipment
+# entity type tag selector, item frame contents
+summon minecraft:item_frame 5 -59 0 {Tags:["f"],Facing:1b,Item:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"start"}}}}}
+execute store result score #h p.c if entity @e[type=#p:gm_mobs]
+scoreboard players get #h p.c
+execute as @e[type=#p:gm_mobs] if items entity @s p:gm_mob * run item replace entity @s p:gm_mob with minecraft:air
+data get entity @n[tag=f] Item
+execute if entity @e[tag=f]
+# armor stand killed while holding a vanishing GM item
+execute as @n[tag=s] at @s run function p:give {slot:"weapon.mainhand",id:"minecraft:emerald",key:"start",v:"main",name:"Start Game",color:"green"}
+kill @e[type=minecraft:item]
+kill @n[tag=s]
+@ticks 2
+execute store result score #ni p.c if entity @e[type=minecraft:item]
+execute as @e[type=minecraft:item] run data get entity @s Item.id
+# debounce math with gametime (frozen world, steps)
+summon minecraft:armor_stand 0 -60 3 {Tags:["d"],NoGravity:1b}
+execute as @n[tag=d] run function p:press
+execute as @n[tag=d] run function p:press
+@ticks 3
+execute as @n[tag=d] run function p:press
+@ticks 6
+execute as @n[tag=d] run function p:press
+scoreboard players get #acts p.c
+# unset source in an operation
+scoreboard players operation #x p.c = #nobody p.c
+scoreboard players get #x p.c
+# data modify success when value unchanged
+data modify storage p:s a set value 1
+execute store success score #d p.c run data modify storage p:s a set value 1
+scoreboard players get #d p.c

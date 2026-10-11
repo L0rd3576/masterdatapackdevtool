@@ -394,12 +394,15 @@ class Linter:
 
     FREE_KEYS = ("custom_data", "nbt", "data", "criteria", "components", "storage", "translate_with", "with",
                  "requirements", "entries_by_name")
+    OPAQUE_KEYS = ("custom_data", "minecraft:custom_data")   # free-form values: never walked (any depth)
+    ADV_REWARD_KEYS = ("function", "loot", "recipes", "experience")   # advancement "rewards" fields (few in vanilla)
 
     def walk_json(self, obj, where, folder, loot_like, known, unknown, keypath):
         if isinstance(obj, dict):
             for k, v in obj.items():
                 parent = keypath[-1] if keypath else None
-                free = parent in self.FREE_KEYS or (len(keypath) >= 2 and keypath[-2] == "criteria" and False)
+                free = parent in self.FREE_KEYS or (len(keypath) >= 2 and keypath[-2] == "criteria" and False) \
+                    or (folder == "advancement" and parent == "rewards" and k in self.ADV_REWARD_KEYS)
                 is_seq = loot_like and norm_id(str(obj.get("type", ""))) == "minecraft:sequence"
                 if is_seq and k == "type" and "functions" not in obj:
                     self.err(where, '"minecraft:sequence" needs a "functions" list (it was NOT renamed to "modifier"; '
@@ -439,6 +442,8 @@ class Linter:
                         name = norm_id(ck.lstrip("!"))
                         if name not in comps:
                             self.err(where, f"unknown data component '{ck}'")
+                if k in self.OPAQUE_KEYS:
+                    continue
                 self.walk_json(v, where, folder, loot_like, known, unknown, keypath + [k])
         elif isinstance(obj, list):
             for x in obj:

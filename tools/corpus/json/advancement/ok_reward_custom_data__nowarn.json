@@ -1,0 +1,1 @@
+{"criteria":{"use":{"trigger":"minecraft:using_item","conditions":{"item":{"predicates":{"minecraft:custom_data":{"tmg_gm":{"key":"start"}}}}}}},"rewards":{"function":"c:helper","experience":0}}

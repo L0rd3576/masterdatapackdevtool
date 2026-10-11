@@ -1,0 +1,99 @@
+> scoreboard objectives add p.c dummy
+  Created new objective [p.c]   [1 ms]
+> scoreboard objectives add p.last dummy
+  Created new objective [p.last]   [0 ms]
+> summon minecraft:armor_stand 0 -60 0 {Tags:["s"],NoGravity:1b,UUID:[I;1,2,3,4]}
+  Summoned new Armor Stand   [19 ms]
+> execute as 00000001-0002-0003-0000-000000000004 run tag @s add viauuid
+     [1 ms]
+> execute if entity @e[tag=viauuid]
+  Test failed   [1 ms]
+> execute store result score #c p.c if entity 00000001-0002-0003-0000-000000000004
+  Test failed   [2 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:diamond 3
+  Replaced 1 slot(s) on Armor Stand with [Diamond]   [6 ms]
+> execute as @n[tag=s] at @s run function p:give {slot:"weapon.mainhand",id:"minecraft:emerald",key:"start",v:"main",name:"Start Game",color:"green"}
+  Running function p:give   [11 ms]
+> data get entity @n[tag=s] equipment.mainhand.components."minecraft:custom_data"
+  Armor Stand has the following entity data: {tmg_gm: {v: "main", key: "start"}}   [8 ms]
+> data get entity @n[type=minecraft:item,tag=p.evdone] Item
+  Diamond has the following entity data: {count: 3, id: "minecraft:diamond"}   [1 ms]
+> execute as @n[tag=s] at @s run function p:give {slot:"weapon.mainhand",id:"minecraft:redstone",key:"start",v:"alt",name:"Cancel",color:"red"}
+  Running function p:give   [3 ms]
+> data get entity @n[tag=s] equipment.mainhand
+  Armor Stand has the following entity data: {components: {"minecraft:item_name": {color: "red", text: "Cancel", italic: 0b}, "minecraft:use_effects": {interact_vibrations: 0b, speed_multiplier: 1.0f, can_sprint: 1b}, "minecraft:max_stack_size": 1, "minecraft:enchantments": {"minecraft:vanishing_curse": 1}, "minecraft:tooltip_display": {hidden_components: ["minecraft:enchantments"]}, "minecraft:enchantment_glint_override": 0b, "minecraft:custom_data": {tmg_gm: {v: "alt", key: "start"}}, "minecraft:consumable": {sound: "minecraft:intentionally_empty", consume_seconds: 1000000.0f, has_consume_particles: 0b, animation: "none"}}, count: 1, id: "minecraft:redstone"}   [2 ms]
+> execute if entity @e[type=minecraft:item,tag=p.evdone,limit=2]
+  Test passed. Count: 2   [1 ms]
+> execute store result score #ev p.c if entity @e[type=minecraft:item,tag=p.evdone]
+  Test passed. Count: 2   [0 ms]
+> execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{key:"start",v:"alt"}}]
+  Test passed. Count: 1   [1 ms]
+> execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{key:"start",v:"main"}}]
+  Test failed   [1 ms]
+> item replace entity @n[tag=s] weapon.offhand with minecraft:emerald[custom_data={tmg_gm:{key:"start",v:"main"}}]
+  Replaced 1 slot(s) on Armor Stand with [Emerald]   [1 ms]
+> item replace entity @n[tag=s] armor.head with minecraft:emerald[custom_data={tmg_gm:{key:"other",v:"main"}}]
+  Replaced 1 slot(s) on Armor Stand with [Emerald]   [1 ms]
+> execute if items entity @n[tag=s] p:gm_mob *
+  Test passed. Count: 3   [3 ms]
+> execute if items entity @n[tag=s] p:gm_mob *[custom_data~{tmg_gm:{key:"start"}}]
+  Test passed. Count: 2   [1 ms]
+> execute if items entity @n[tag=s] p:gm_all *
+  Test passed. Count: 2   [1 ms]
+> item replace entity @n[tag=s] p:gm_mob with minecraft:air
+  Replaced 1 slot(s) on Armor Stand with [Air]   [1 ms]
+> item replace entity @n[tag=s] p:gm_mob with minecraft:air
+  Replaced 1 slot(s) on Armor Stand with [Air]   [1 ms]
+> data get entity @n[tag=s] equipment
+  Armor Stand has the following entity data: {head: {components: {"minecraft:custom_data": {tmg_gm: {v: "main", key: "other"}}}, count: 1, id: "minecraft:emerald"}}   [1 ms]
+> summon minecraft:item_frame 5 -59 0 {Tags:["f"],Facing:1b,Item:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"start"}}}}}
+  Summoned new Item Frame   [3 ms]
+  | [11:39:19] [Server thread/ERROR]: Block-attached entity at invalid position: null
+> execute store result score #h p.c if entity @e[type=#p:gm_mobs]
+  Test passed. Count: 2   [1 ms]
+> scoreboard players get #h p.c
+  #h has 2 [p.c]   [1 ms]
+> execute as @e[type=#p:gm_mobs] if items entity @s p:gm_mob * run item replace entity @s p:gm_mob with minecraft:air
+  Replaced 1 slot(s) on Armor Stand with [Air]Replaced 1 slot(s) on Item Frame with [Air]   [2 ms]
+> data get entity @n[tag=f] Item
+  Found no elements matching Item   [1 ms]
+> execute if entity @e[tag=f]
+  Test passed. Count: 1   [0 ms]
+> execute as @n[tag=s] at @s run function p:give {slot:"weapon.mainhand",id:"minecraft:emerald",key:"start",v:"main",name:"Start Game",color:"green"}
+  Running function p:give   [1 ms]
+> kill @e[type=minecraft:item]
+  Killed 2 entities   [3 ms]
+> kill @n[tag=s]
+  Killed Armor Stand   [3 ms]
+> @ticks 2
+  (stepped 2 ticks in 0.10s)
+> execute store result score #ni p.c if entity @e[type=minecraft:item]
+  Test failed   [0 ms]
+> execute as @e[type=minecraft:item] run data get entity @s Item.id
+     [0 ms]
+> summon minecraft:armor_stand 0 -60 3 {Tags:["d"],NoGravity:1b}
+  Summoned new Armor Stand   [1 ms]
+> execute as @n[tag=d] run function p:press
+  Running function p:pressFunction p:press returned 0   [1 ms]
+> execute as @n[tag=d] run function p:press
+  Running function p:pressFunction p:press returned 0   [1 ms]
+> @ticks 3
+  (stepped 3 ticks in 0.15s)
+> execute as @n[tag=d] run function p:press
+  Running function p:pressFunction p:press returned 0   [1 ms]
+> @ticks 6
+  (stepped 6 ticks in 0.25s)
+> execute as @n[tag=d] run function p:press
+  Running function p:pressFunction p:press returned 1   [1 ms]
+> scoreboard players get #acts p.c
+  #acts has 1 [p.c]   [0 ms]
+> scoreboard players operation #x p.c = #nobody p.c
+  Set [p.c] for #x to 0   [0 ms]
+> scoreboard players get #x p.c
+  #x has 0 [p.c]   [0 ms]
+> data modify storage p:s a set value 1
+  Modified storage p:s   [2 ms]
+> execute store success score #d p.c run data modify storage p:s a set value 1
+  Nothing changed. The specified properties already have these values   [1 ms]
+> scoreboard players get #d p.c
+  #d has 0 [p.c]   [0 ms]

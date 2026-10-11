@@ -7,6 +7,8 @@ Usage:
 Each corpus line becomes function c:lNNNN. The server's load log says which functions failed to parse;
 the linter's verdict is compared. Exit 1 if the linter ACCEPTS a line the server REJECTS (a linter gap)
 or REJECTS a line the server accepts that is not marked '## lint-only' (a false positive).
+JSON cases in tools/corpus/json/: '__lintonly' in the name = only the linter flags it; '__nowarn' = must lint
+without WARNs too.
 """
 import json
 import os
@@ -95,6 +97,12 @@ def main(argv):
         m = re.match(r"ERROR data/j/(\S+?): (.*)", l)
         if m:
             jlint.setdefault(m.group(1), m.group(2))
+    # JSON cases named *__nowarn.json must also be warning-free (a WARN there is a false positive too).
+    jwarn = {}
+    for l in lint.stdout.splitlines():
+        m = re.match(r"WARN  data/j/(\S+?): (.*)", l)
+        if m and "__nowarn" in m.group(1):
+            jwarn.setdefault(m.group(1), m.group(2))
 
     # Run 1: JSON corpus only (registry errors abort the server before functions load).
     build([], with_json=True)
@@ -159,6 +167,8 @@ def main(argv):
                 print(f"  {'REJECT' if s_bad or l_bad else 'ok':6} json {case}\n"
                       + (f"     server: {jsrv[case]}\n" if s_bad else "")
                       + (f"     linter: {jlint[case]}\n" if l_bad else ""), end="")
+    for case, msg in sorted(jwarn.items()):
+        fps.append(f"  json {case} (__nowarn case warns)\n     linter: {msg}")
     print(f"json corpus: {len(jcases)} files, server rejected {len(jsrv)}, linter rejected {len(jlint)}")
     print(f"corpus: {len(lines)} lines, server rejected {len(srv_err)}, linter rejected {len(lint_err)}, agree {agree}")
     if gaps:

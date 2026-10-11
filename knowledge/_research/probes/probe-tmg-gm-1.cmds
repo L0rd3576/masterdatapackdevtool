@@ -1,0 +1,87 @@
+# Probe 2026-10-11: Game Master item (Team Minigames). Pack: tmg-gm-pack
+scoreboard objectives add p.c dummy
+scoreboard objectives add p.d minecraft.dropped:minecraft.emerald
+advancement grant @a only p:use_obj
+summon minecraft:armor_stand 0 -60 0 {Tags:["s"],NoGravity:1b}
+# 1 full GM item
+item replace entity @n[tag=s] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start"}},item_name={text:"Start Game",color:"green"},consumable={consume_seconds:1000000.0f,animation:"none",sound:"minecraft:intentionally_empty",has_consume_particles:false},use_effects={can_sprint:true,speed_multiplier:1.0f,interact_vibrations:false},max_stack_size=1,enchantments={"minecraft:vanishing_curse":1},enchantment_glint_override=false,tooltip_display={hidden_components:["minecraft:enchantments"]}]
+data get entity @n[tag=s] equipment.mainhand
+# 2 old pack forms (int consume_seconds, int speed)
+item replace entity @n[tag=s] weapon.offhand with minecraft:breeze_rod[custom_data={can_dash:1b},consumable={consume_seconds:9999999},use_effects={speed_multiplier:1,can_sprint:true}]
+data get entity @n[tag=s] equipment.offhand
+# 3 limits / bad values
+item replace entity @n[tag=s] armor.head with minecraft:emerald[consumable={consume_seconds:2147483647f}]
+item replace entity @n[tag=s] armor.head with minecraft:emerald[consumable={animation:"nonee"}]
+item replace entity @n[tag=s] armor.head with minecraft:emerald[use_effects={speed_multiplier:1.5f}]
+item replace entity @n[tag=s] armor.head with minecraft:emerald[creative_slot_lock={}]
+data get entity @n[tag=s] equipment.head
+# 4 predicates, counting, slot names on a non-player
+execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{key:"start"}}]
+execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{}}]
+execute if items entity @n[tag=s] weapon.mainhand *[custom_data~{tmg_gm:{key:"cancel"}}]
+execute store result score #c p.c if items entity @n[tag=s] weapon.* *
+scoreboard players get #c p.c
+execute if items entity @n[tag=s] player.cursor *
+execute if items entity @n[tag=s] container.* *
+execute if items entity @n[tag=s] hotbar.4 *
+execute if items entity @n[tag=s] player.crafting.* *
+execute if items entity @n[tag=s] enderchest.* *
+execute as @n[tag=s] run clear @s *
+# 5 slot sources from files
+execute if items entity @n[tag=s] p:a *
+execute if items entity @n[tag=s] p:b *
+execute if items entity @n[tag=s] p:c *
+execute if slots entity @n[tag=s] p:b
+execute store result score #c p.c if items entity @n[tag=s] p:b *
+scoreboard players get #c p.c
+item replace entity @n[tag=s] p:b with minecraft:air
+data get entity @n[tag=s] equipment
+# 6 item entities: detect + kill by contents
+item replace entity @n[tag=s] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start"}}]
+summon minecraft:item 2 -60 0 {Tags:["it"],Item:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"start"}}}}}
+summon minecraft:item 3 -60 0 {Tags:["it2"],Item:{id:"minecraft:emerald",count:1}}
+execute as @e[type=minecraft:item] if items entity @s contents *[custom_data~{tmg_gm:{}}] run kill @s
+execute if entity @e[type=minecraft:item,tag=it]
+execute if entity @e[type=minecraft:item,tag=it2]
+# 7 evict an item into a fresh item entity
+summon minecraft:item 4 -60 0 {Tags:["ev"],Item:{id:"minecraft:stone",count:1},PickupDelay:0s}
+item replace entity @n[tag=ev] contents from entity @n[tag=s] weapon.offhand
+data get entity @n[tag=ev] Item
+item replace entity @n[tag=s] weapon.offhand with minecraft:air
+data get entity @n[tag=s] equipment
+# 8 vanishing curse on mob death (equipment drop chance 2.0)
+summon minecraft:zombie 10 -60 0 {Tags:["z1"],NoAI:1b,PersistenceRequired:1b,equipment:{mainhand:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"z1"}},"minecraft:enchantments":{"minecraft:vanishing_curse":1}}}},drop_chances:{mainhand:2.0f}}
+summon minecraft:zombie 12 -60 0 {Tags:["z2"],NoAI:1b,PersistenceRequired:1b,equipment:{mainhand:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"z2"}}}}},drop_chances:{mainhand:2.0f}}
+data get entity @n[tag=z1] drop_chances
+kill @e[tag=z1]
+kill @e[tag=z2]
+@ticks 2
+execute store result score #z1 p.c if entity @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{tmg_gm:{key:"z1"}}}}}]
+execute store result score #z2 p.c if entity @e[type=minecraft:item,nbt={Item:{components:{"minecraft:custom_data":{tmg_gm:{key:"z2"}}}}}]
+scoreboard players get #z1 p.c
+scoreboard players get #z2 p.c
+# 9 rename by item replace keeps the slot; item modify set_name inline
+item replace entity @n[tag=s] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start",alt:1b}},item_name={text:"Cancel",color:"red"}]
+data get entity @n[tag=s] equipment.mainhand.components
+# 10 cost bench: 10 stand-ins with the item + 50 plain item entities, 100 upkeeps per tick
+execute positioned 20 -60 20 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b,equipment:{mainhand:{id:"minecraft:emerald",count:1,components:{"minecraft:custom_data":{tmg_gm:{key:"start"}}}}}}
+execute positioned 20 -60 21 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+execute positioned 20 -60 22 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+execute positioned 20 -60 23 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+execute positioned 20 -60 24 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+execute positioned 21 -60 20 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+execute positioned 21 -60 21 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+execute positioned 21 -60 22 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+execute positioned 21 -60 23 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+execute positioned 21 -60 24 run summon minecraft:armor_stand ~ ~ ~ {Tags:["g"],NoGravity:1b}
+item replace entity @e[tag=g] weapon.mainhand with minecraft:emerald[custom_data={tmg_gm:{key:"start"}}]
+execute positioned 30 -60 30 run summon minecraft:item ~ ~ ~ {Item:{id:"minecraft:dirt",count:1},Age:-32768s,PickupDelay:32767s}
+execute as @e[type=minecraft:item,limit=1] at @s run function p:dup49
+@ticks 100
+tick query
+scoreboard players set #bench p.c 1
+@ticks 100
+tick query
+scoreboard players get #miss p.c
+execute store result score #ni p.c if entity @e[type=minecraft:item]
+scoreboard players get #ni p.c

@@ -12,6 +12,8 @@ one, verify it (copy a vanilla file, add a corpus line to `tools/corpus/commands
 ## Commands
 - Exact accepted syntax of slot sources beyond the tested names (container.*, weapon.*, weapon.mainhand, armor.*,
   armor.head/chest/body, hotbar.0, mob.inventory.0, contents) - and how to reference a `slot_source/` file.
+  RESOLVED 2026-10-11: file `data/<ns>/slot_source/<path>.json` is referenced as `<ns>:<path>` (see item-components.md
+  "Right-click items, slot sources"); still open: `player.cursor`/`player.crafting.*` at runtime on a real player.
 - `/publish` lost `gamemode` (26.3), `/give` over-limit errors, `/tick step` errors (wiki).
 - Whether integer y coordinates are centred like x/z for entity positions (only x was runtime-verified).
 

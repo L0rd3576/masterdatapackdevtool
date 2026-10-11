@@ -44,3 +44,13 @@ JSON corpus (`tools/corpus/json/advancement/`).
 advancement revoke @s only c:used_carrot_stick
 ```
 (The advancement JSON above loaded on the 26.3 server: `tools/corpus/json/advancement/ok_using_item.json`.)
+
+## using_item with custom_data (probe 2026-10-11, `_research/probes/tmg-gm-pack/data/p/advancement`)
+- [V loads] `"item":{"predicates":{"minecraft:custom_data":{"tmg_gm":{"key":"start"}}}}` (JSON object) and the SNBT string form
+  `"minecraft:custom_data":"{tmg_gm:{key:\"start\"}}"` both load; `inventory_changed` with `"items":[{"predicates":{...}}]` loads.
+- [P] How often `using_item` fires while the button is held needs a real player (vanilla code fires it each use tick). Debounce on
+  game time: ignore a fire if the previous fire was <= N ticks ago; treat an unset last-fire score as a new press
+  (a fresh test world has game time < 5, so "now - 0" looked like a hold in the probe).
+- [V] `"rewards":{"function":"c:helper","experience":0}` loads (diff_corpus, `tools/corpus/json/advancement/ok_reward_custom_data__nowarn.json`).
+  Linter fixed 2026-10-11 (GM G0): `rewards` keys function/loot/recipes/experience accepted; `custom_data` /
+  `minecraft:custom_data` values are never key-checked (any depth).
