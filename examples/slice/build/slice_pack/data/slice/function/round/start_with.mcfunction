@@ -17,6 +17,9 @@ execute store result storage slice:round current.participants int 1 run scoreboa
 tag @e[tag=slice.queued] add slice.in_round
 tag @e[tag=slice.queued] add slice.alive
 tag @e[tag=slice.queued] remove slice.queued
+scoreboard players set #tid slice.var 0
+execute as @e[tag=slice.in_round] run function slice:round/_tid
+scoreboard players set #mult_pct slice.round 100
 scoreboard players set @e[tag=slice.in_round] slice.score 0
 scoreboard players set @e[tag=slice.in_round] slice.deaths 0
 scoreboard players set #state slice.round 1

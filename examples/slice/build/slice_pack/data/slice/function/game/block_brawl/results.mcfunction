@@ -1,0 +1,2 @@
+# block_brawl: no 'results' hook in the manifest (framework stub)
+return 0

@@ -9,7 +9,7 @@ import schema
 
 ROOT = core.ROOT
 FRAMEWORK_PACK = os.path.join(ROOT, "tools", "framework", "pack")
-HOOKS = ("load", "start", "player_start", "tick", "eliminated", "end")
+HOOKS = ("load", "start", "player_start", "tick", "eliminated", "time_up", "end", "results", "teardown")
 
 
 def win_conditions():
@@ -116,6 +116,8 @@ def _cross_check(pr, pool_path):
             elif not rel.endswith(".mcfunction"):
                 pr.err(f, "hook files must end in .mcfunction", f"functions.{hook}")
         r = g["rules"]
+        if r.get("time_up") == "hook" and r.get("time_limit_seconds", 180) > 0 and "time_up" not in g["functions"]:
+            pr.warn(f, "rules.time_up is \"hook\" but there is no time_up hook: the round never ends on time", "rules")
         if r.get("gamemode", "auto") in ("auto", "survival") and r.get("block_break") and not r.get("block_place"):
             pr.warn(f, "block_place:false cannot be enforced in survival mode (only adventure mode stops placing); "
                        "players will be able to place blocks", "rules")

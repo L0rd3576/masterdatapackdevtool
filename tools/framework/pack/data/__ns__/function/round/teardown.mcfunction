@@ -3,6 +3,7 @@ function __lib__:rules/revert
 execute as @a[tag=__ns__.in_round] run function __lib__:player/restore_inventory
 execute as @a[tag=__ns__.in_round] run function __lib__:player/restore_gamemode
 execute as @e[tag=__ns__.in_round] run function __lib__:player/restore_position
+function __ns__:round/hook {hook:"teardown"}
 scoreboard players reset @e[tag=__ns__.in_round] __ns__.score
 tag @e remove __ns__.alive
 tag @e remove __ns__.in_round

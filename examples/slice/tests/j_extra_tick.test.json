@@ -1,0 +1,25 @@
+{
+  "description": "project.json functions: slice:extra/load (from the pack_src overlay) ran at load via #slice:extra_load; slice:extra/tick runs every tick via #slice:extra_tick",
+  "steps": [
+    {
+      "assert_score": {
+        "target": "#extra_load",
+        "objective": "slice.var",
+        "equals": 1
+      }
+    },
+    {
+      "run": "scoreboard players set #extra_tick slice.var 0"
+    },
+    {
+      "ticks": 5
+    },
+    {
+      "assert_score": {
+        "target": "#extra_tick",
+        "objective": "slice.var",
+        "equals": 5
+      }
+    }
+  ]
+}

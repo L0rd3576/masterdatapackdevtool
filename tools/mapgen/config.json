@@ -145,6 +145,11 @@
       "minecraft:cracked_stone_bricks": "#686868", "minecraft:oak_leaves": "#3f7f2a", "minecraft:grass_block": "#6aa84f",
       "minecraft:dirt": "#866043", "minecraft:stone": "#7d7d7d", "minecraft:sand": "#dbd3a0", "minecraft:water": "#3f6fd8",
       "minecraft:snow_block": "#f4fafa", "minecraft:lava": "#e85a10", "minecraft:bedrock": "#333333",
+      "minecraft:white_concrete": "#cfd5d6", "minecraft:light_gray_concrete": "#7d7d73",
+      "minecraft:light_blue_concrete": "#2489c7", "minecraft:polished_blackstone": "#3b3540",
+      "minecraft:polished_blackstone_bricks": "#2c272e", "minecraft:blackstone": "#2a2329",
+      "minecraft:chiseled_polished_blackstone": "#5a5262", "minecraft:deepslate_bricks": "#4a4a4f",
+      "minecraft:shroomlight": "#f19e4c",
       "minecraft:*_wool": "#b0b0b0", "minecraft:*_planks": "#a0824e"
     }
   },

@@ -52,6 +52,17 @@
   (`queue/join` as them). They cover selection, teleport, rules, payout and restore. Not covered: real player
   input, death and respawn screens, gamemode on players, inventory (see `UNVERIFIED.md`).
 
+## Generators (`tools/mapgen/generators/`)
+`static_arena` (walled rectangle, pillars), `room_grid` (rooms + corridors), `heightmap_terrain` (noise terrain),
+`circle_arena` (round arenas, 2026-10-10): disk `dx*dx + dz*dz <= radius^2` around centre cell (W, W); optional outer
+`lava_width` ring of `minecraft:lava` in the top floor layer (needs `floor_layers: 2`: [V] probe-tmg-3, lava over air
+falls into the void); optional wall = `wall_thickness` 8-neighbour dilations of the disk (closes diagonal gaps, so lava
+never touches air sideways), `light_every` lights in the inner wall ring at floor top + 2; spawn pads on a circle
+(`spawn_radius`, default round(0.6 x inner radius)); markers `center` (floor block) and `view` (floor top + 8), both
+`reachable: false`. No randomness. [V] Team Minigames `lava_arena` (r 20, lava 3, wall 10): report.py all PASS incl.
+server_load (72 sampled blocks match). Watch: 16 spawns on a circle need radius >= 8 to stay `spawns.min_spacing` (3)
+apart; `view` needs a model height >= floor top + 9.
+
 ## Tools (all `python tools/mapgen/<x>.py`)
 `generate.py` (.nbt + meta, `--hash`), `render.py` (top/layers PNG + ASCII), `validate.py` (schemas, cross-refs,
 `--maps`), `report.py` (everything + server load), `gallery.py` (`--check`), `selftest_failures.py` (3 broken

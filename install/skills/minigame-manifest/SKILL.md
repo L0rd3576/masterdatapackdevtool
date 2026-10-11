@@ -19,9 +19,12 @@ highest score, restored after the round).
    - `win_condition`: one of the folders in `tools/framework/pack/data/__ns__/function/win/`.
    - `payout`: `linear` (each winner base + per_participant*n) or `pot` (split), plus `participation`.
 2. **Hooks** go in `logic/<id>/*.mcfunction`, referenced from `functions` (load, start, player_start, tick,
-   eliminated, end). Keep them small. Write `__ns__` for the project namespace and `__lib__` for the vendored
+   eliminated, time_up, end, results, teardown). Keep them small. Write `__ns__` for the project namespace and `__lib__` for the vendored
    library: build_pack substitutes both and copies hooks to `function/game/<id>/<hook>.mcfunction` (missing hooks
-   become stubs). Framework tags you can use: `__ns__.in_round`, `__ns__.alive`; score `__ns__.score`.
+   become stubs). Framework tags you can use: `__ns__.in_round`, `__ns__.alive`, `__ns__.elim_now`; scores
+   `__ns__.score`, `__ns__.tid` (team id, win `last_team`), `#mult_pct __ns__.round` (payout percent).
+   Bigger projects: `pack_src` overlay + project `functions` (load/tick) + `output_mode: merge`
+   (`knowledge/framework-contract.md`).
    Call mcdp_lib before writing helpers (`library/INDEX.md`).
    Look up every command with `tools/cmd_syntax.py`.
 3. **Preset** (optional) `presets/<id>.json`: {id, minigame, display_name, settings?, rules?}.

@@ -40,3 +40,8 @@ one, verify it (copy a vanilla file, add a corpus line to `tools/corpus/commands
 - `rules` `block_break:0b`: attribute modifier `block_break_speed` x0 should stop survival/adventure breaking; untested.
   Whether command-added attribute modifiers survive player death is unknown (re-apply with `rules/apply_self`).
 - `item/give*`, `item/clear*`, `msg/*` delivery: only verified to parse/run with zero players (return 0).
+- (2026-10-10, team_minigames plan) Needs real players: tab list shows a per-player `numberformat fixed` text; team
+  `friendlyFire false` blocks player hits *and* their knockback; `entity_interaction_range` x0 stops a player attacking;
+  `movement_speed`/`jump_strength` x0 freezes a player; knockback-enchanted stick knocks players back (levels 1-4);
+  `execute in <dim> run spawnpoint` sets a respawn in a custom dimension; HurtTime=10 visible for player-vs-player hits;
+  `gamemode spectator` on a dead player sticks through respawn; `leave_game` counts once per disconnect.

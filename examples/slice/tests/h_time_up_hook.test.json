@@ -1,0 +1,106 @@
+{
+  "description": "rules.time_up \"hook\": when the timer runs out the time_up hook runs once and the round keeps running; round/end then runs the results hook (after payout) and the teardown hook",
+  "setup": [
+    "summon minecraft:armor_stand 0 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 2 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 4 -60 2 {Tags:[\"t.p\"]}",
+    "execute as @e[tag=t.p] run function slice:queue/join",
+    "scoreboard players set #time_up_calls slice.var 0",
+    "scoreboard players set #results_calls slice.var 0",
+    "scoreboard players set #teardown_calls slice.var 0"
+  ],
+  "steps": [
+    {
+      "run": "function slice:round/start_with {game:\"team_clash\",map:\"duel_pit\",preset:\"default\"}"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:round",
+        "path": "current.rules.time_up",
+        "equals": "\"hook\""
+      }
+    },
+    {
+      "run": "scoreboard players set #global slice.rtimer 2"
+    },
+    {
+      "ticks": 3
+    },
+    {
+      "assert_score": {
+        "target": "#time_up_calls",
+        "objective": "slice.var",
+        "equals": 1
+      }
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "ticks": 3
+    },
+    {
+      "assert_score": {
+        "target": "#time_up_calls",
+        "objective": "slice.var",
+        "equals": 1
+      }
+    },
+    {
+      "assert_score": {
+        "target": "#results_calls",
+        "objective": "slice.var",
+        "equals": 0
+      }
+    },
+    {
+      "run": "function slice:round/end"
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    },
+    {
+      "assert_score": {
+        "target": "#results_calls",
+        "objective": "slice.var",
+        "equals": 1
+      }
+    },
+    {
+      "assert_score": {
+        "target": "#teardown_calls",
+        "objective": "slice.var",
+        "equals": 1
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=42}]",
+        "contains": "Count: 3"
+      }
+    }
+  ],
+  "teardown": [
+    "kill @e[tag=t.p]",
+    "scoreboard players reset * slice.coins",
+    "tag @e remove slice.queued"
+  ]
+}

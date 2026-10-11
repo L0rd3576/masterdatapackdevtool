@@ -1,0 +1,13 @@
+summon minecraft:pig 0 -60 0 {NoAI:1b,Tags:["v"]}
+summon minecraft:pig 3 -60 0 {NoAI:1b,Tags:["a"]}
+damage @e[tag=v,limit=1] 1 minecraft:mob_attack by @e[tag=a,limit=1]
+@ticks 1
+execute as @e[tag=v] if entity @s[predicate=tmg:on_fire] run say fire_before
+data merge entity @e[tag=v,limit=1] {Fire:100s}
+execute as @e[tag=v] if entity @s[predicate=tmg:on_fire] run say fire_after
+execute as @e[tag=v] if predicate tmg:on_fire run say fire_pred
+scoreboard objectives add tmg.money dummy
+scoreboard players set #x tmg.money 705
+function tmg:fmt {who:"#x",sym:"$",d:7,pad:"0",c:5}
+execute in tmg:arena if dimension tmg:arena run say in_arena
+execute in minecraft:overworld unless dimension tmg:arena run say not_arena

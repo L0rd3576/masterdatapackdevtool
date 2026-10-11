@@ -1,0 +1,37 @@
+{
+  "$schema": "../../../schemas/minigame.schema.json",
+  "id": "team_clash",
+  "display_name": "Team Clash",
+  "description": "Framework extension demo: last team standing (tid), time_up hook, results/teardown hooks. Pool weight 0: only started with round/start_with.",
+  "players": {
+    "min": 3,
+    "max": 6
+  },
+  "map_tags": {
+    "all_of": [
+      "pvp"
+    ],
+    "none_of": [
+      "maze"
+    ]
+  },
+  "rules": {
+    "pvp": true,
+    "time_limit_seconds": 120,
+    "time_up": "hook",
+    "respawn": "eliminate"
+  },
+  "win_condition": "last_team",
+  "payout": {
+    "type": "linear",
+    "base": 10,
+    "per_participant": 10,
+    "participation": 2
+  },
+  "functions": {
+    "tick": "logic/team_clash/tick.mcfunction",
+    "time_up": "logic/team_clash/time_up.mcfunction",
+    "results": "logic/team_clash/results.mcfunction",
+    "teardown": "logic/team_clash/teardown.mcfunction"
+  }
+}

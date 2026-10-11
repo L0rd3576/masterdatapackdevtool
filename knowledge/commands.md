@@ -117,3 +117,37 @@ Every example marked OK below was accepted by the 26.3 server inside a function 
 - `item fill|override`, `execute if|unless slots (block <pos>|entity <targets>) <slot_source>`.
 - `time of <world_clock> set|add|pause|resume|rate|query ...` (26.1 world clocks).
 - `tick` exists but needs permission level 3: not usable from functions.
+
+## Combat, attributes, scoreboard display (probe 2026-10-10, `knowledge/_research/probes/probe-tmg-1.txt`, `-2.txt`)
+- [V] `attribute <single target> <attr> modifier add <id> <value> add_value|add_multiplied_base|add_multiplied_total`,
+  `... modifier remove <id>`, `... get`, `... base get`. Target is single: use `execute as ... run attribute @s ...`.
+  `movement_speed modifier add x -1 add_multiplied_total` -> `get` prints `is 0.0`; remove -> back to base (armor stand 0.7).
+  Armor stands have `movement_speed` 0.7, `jump_strength` 0.42, `entity_interaction_range` 3.0, `max_health` 20.
+- [V] `max_health modifier add ... 20 add_value` does not heal; `effect give <e> minecraft:instant_health 1 5 true`
+  heals to the new max next tick (pig 9 -> 30, armor stand -> 30). Removing the modifier clamps Health to the new max.
+- [V] `execute on attacker` = the entity that last damaged @s (works after `damage <t> 1 minecraft:mob_attack by <e>`);
+  gone again ~100 ticks later (checked at 110). `HurtTime` is `10s` right after a hit and still 10 when the next tick's
+  `#minecraft:tick` function runs (functions run before entity ticks; probe pack logged it), then 9, ..., 0.
+- [V] Armor stands ignore `minecraft:mob_attack` (`Target is invulnerable to the given damage type`): use `NoAI` pigs as
+  damage stand-ins. Team `friendlyFire false` does NOT stop `damage ... by <mob teammate>` (mobs); player behaviour unverified.
+- [V] `execute if block ~ ~ ~ minecraft:lava` detects an entity standing in lava. There is no `#minecraft:lava` block tag.
+- [V] Entity predicate `{"type":"minecraft:entity_properties","entity":"this","predicate":{"minecraft:flags":{"is_on_fire":true}}}`
+  works as `@s[predicate=ns:on_fire]` and `execute if predicate ns:on_fire` (true after `data merge entity @s {Fire:100s}`).
+- [V] `execute if dimension <custom ns:dim>` / `unless dimension` work with a pack dimension.
+- [V] `scoreboard objectives setdisplay list <obj>` (tab list); `scoreboard players display numberformat <holder> <obj> fixed
+  {text:"$7.50"}` and `scoreboard objectives modify <obj> numberformat styled {color:"gold"}` are accepted. Client rendering unverified.
+- [V] A macro argument may contain `$`: `$say $(sym)$(d).$(pad)$(c)` with `{sym:"$",d:7,pad:"0",c:5}` prints `$7.05`.
+- [V] `execute store result score #t o run time query gametime` stores the game time (ticks).
+- [V] Game rules `immediate_respawn` (default false) and `pvp` (default true) exist in 26.3 (`registries.json minecraft:game_rule`).
+- [V] Criteria `minecraft.custom:minecraft.leave_game` and `trigger` objectives create fine.
+
+## Shrinking circle and empty function tags (probe 2026-10-10, `knowledge/_research/probes/probe-tmg-3.txt`, pack `tmg-zone-pack`)
+- [V] A function tag file `{"values":[]}` loads without error and `function #ns:empty` runs (does nothing).
+- [V] Score-only circle sweep: rows/cells by recursion with `execute ... positioned ~1 ~ ~` / `~ ~ ~1`, d2 = dx*dx+dz*dz
+  via `scoreboard players operation`, `setblock` when `r2 < d2 <= Rb2`. R=4, r2=4 on a 9x9 stone square changed
+  exactly 36 cells (lava or air); 45 stayed stone. Only one macro call per sweep (`positioned ~-$(R) ~ ~-$(R)`).
+- [V] `setblock ... minecraft:lava` in the top layer of a 2-layer floor does not spread: after 60 ticks no lava above
+  or below. (A 1-layer floor would let lava fall into the void: keep a solid layer under any lava.)
+- [V] Items: copper armor (`copper_helmet/chestplate/leggings/boots`) and `copper_sword` exist. Armor points per full
+  set (reports): leather 7, copper 10, golden 11, chainmail 12, iron 15, diamond 20 (+8 toughness), netherite 20 (+12).
+  Sword attack_damage: wooden/golden 3, stone/copper 4, iron 5, diamond 6, netherite 7.

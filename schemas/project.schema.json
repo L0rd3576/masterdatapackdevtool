@@ -8,7 +8,20 @@
     "$schema": {"type": "string"},
     "namespace": {"type": "string", "pattern": "^[a-z0-9_]{1,24}$", "description": "Datapack namespace; also prefixes objectives, tags and storages."},
     "description": {"type": "string", "default": "Minigame framework pack (built by tools/build_pack.py)"},
-    "output": {"type": "string", "default": "build/pack", "description": "Output datapack dir, relative to the project dir. Overwritten on every build."},
+    "output": {"type": "string", "default": "build/pack", "description": "Output datapack dir, relative to the project dir. Overwritten on every build (see output_mode)."},
+    "output_mode": {"type": "string", "enum": ["replace", "merge"], "default": "replace",
+                    "description": "replace: delete and rewrite the whole output dir (only if build_pack created it). merge: rewrite only data/, tests/, pack.mcmeta and .build_pack_owned; other files in the output dir (docs, the project itself) are kept. An output with data/ but no .build_pack_owned is refused unless --adopt is passed."},
+    "pack_src": {"type": "string", "description": "Optional dir (relative to the project) of hand-written pack files (e.g. pack/data/<ns>/function/...) copied over the built pack last; __ns__ and __lib__ are replaced in paths and in .mcfunction/.json files. A file that the build already wrote is an ERROR (no silent overrides)."},
+    "functions": {
+      "type": "object",
+      "description": "Project-wide functions run every load/tick (compiled into tags #<ns>:extra_load, #<ns>:extra_tick). Load: after the framework load and minigame load hooks. Tick: first in <ns>:tick, every tick in every state.",
+      "properties": {
+        "load": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"}, "default": []},
+        "tick": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"}, "default": []}
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
     "lib_prefix": {"type": "string", "pattern": "^[a-z0-9_]+$", "default": "mcdp_lib", "description": "Namespace of the vendored function library."},
     "players": {
       "$ref": "common.schema.json#/definitions/player_range",

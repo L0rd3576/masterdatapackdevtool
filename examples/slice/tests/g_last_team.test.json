@@ -1,0 +1,169 @@
+{
+  "description": "win condition last_team: FFA gets unique tids 1..n; one eliminated -> round goes on; the last two eliminated in the same tick -> both win (10 + 10 x 3 + 2). Then 2 teams via tid (4 stand-ins): a team with an eliminated member wins as a whole (10 + 10 x 4 + 2)",
+  "setup": [
+    "summon minecraft:armor_stand 0 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 2 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 4 -60 2 {Tags:[\"t.p\"]}",
+    "execute as @e[tag=t.p] run function slice:queue/join"
+  ],
+  "steps": [
+    {
+      "assert": "if data storage slice:registry games.team_clash"
+    },
+    {
+      "assert": "unless data storage slice:registry by_count.n3[{value:{game:\"team_clash\"}}]"
+    },
+    {
+      "run": "function slice:round/start_with {game:\"team_clash\",map:\"duel_pit\",preset:\"default\"}"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.tid=1}]",
+        "contains": "Count: 1"
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.tid=2}]",
+        "contains": "Count: 1"
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.tid=3}]",
+        "contains": "Count: 1"
+      }
+    },
+    {
+      "run": "execute as @e[tag=t.p,scores={slice.tid=1}] run function slice:round/eliminate"
+    },
+    {
+      "ticks": 1
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "run": "tag @e[tag=t.p,tag=slice.alive] add slice.out_next"
+    },
+    {
+      "ticks": 1
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=42}]",
+        "contains": "Count: 2"
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=2,slice.tid=1}]",
+        "contains": "Count: 1"
+      }
+    },
+    {
+      "run": "kill @e[tag=t.p]"
+    },
+    {
+      "run": "scoreboard players reset * slice.coins"
+    },
+    {
+      "run": "summon minecraft:armor_stand 0 -60 2 {Tags:[\"t.p\"]}"
+    },
+    {
+      "run": "summon minecraft:armor_stand 2 -60 2 {Tags:[\"t.p\"]}"
+    },
+    {
+      "run": "summon minecraft:armor_stand 4 -60 2 {Tags:[\"t.p\"]}"
+    },
+    {
+      "run": "summon minecraft:armor_stand 6 -60 2 {Tags:[\"t.p\"]}"
+    },
+    {
+      "run": "execute as @e[tag=t.p] run function slice:queue/join"
+    },
+    {
+      "run": "function slice:round/start_with {game:\"team_clash\",map:\"duel_pit\",preset:\"default\"}"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "run": "scoreboard players set @e[tag=t.p] slice.tid 2"
+    },
+    {
+      "run": "scoreboard players set @e[tag=t.p,limit=2] slice.tid 1"
+    },
+    {
+      "run": "execute as @e[tag=t.p,scores={slice.tid=1},limit=1] run function slice:round/eliminate"
+    },
+    {
+      "ticks": 1
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "run": "execute as @e[tag=t.p,scores={slice.tid=2}] run function slice:round/eliminate"
+    },
+    {
+      "ticks": 1
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=52,slice.tid=1}]",
+        "contains": "Count: 2"
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=2,slice.tid=2}]",
+        "contains": "Count: 2"
+      }
+    }
+  ],
+  "teardown": [
+    "kill @e[tag=t.p]",
+    "scoreboard players reset * slice.coins",
+    "tag @e remove slice.queued"
+  ]
+}

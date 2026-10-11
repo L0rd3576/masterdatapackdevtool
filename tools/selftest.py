@@ -43,9 +43,78 @@ def vanilla_pack():
     return dst
 
 
+def build_checks():
+    """build_pack merge mode (E1) and pack_src overlay (E2) on a temp copy of examples/slice. Returns failures."""
+    import contextlib
+    import io
+    import json
+    import shutil
+    import tempfile
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import build_pack
+    from core import MapgenError
+    tmp = tempfile.mkdtemp(prefix="bp_selftest_")
+    out = os.path.join(tmp, "pack")
+    src = os.path.join(out, "src")
+    shutil.copytree(os.path.join(ROOT, "examples", "slice"), src, ignore=shutil.ignore_patterns("build"))
+    pj = os.path.join(src, "project.json")
+    proj = json.load(open(pj, encoding="utf-8"))
+    proj.update(output="..", output_mode="merge")
+    json.dump(proj, open(pj, "w", encoding="utf-8"), indent=2)
+    os.makedirs(os.path.join(out, "data", "old", "function"))
+    open(os.path.join(out, "data", "old", "function", "x.mcfunction"), "w").write("say old\n")
+    open(os.path.join(out, "notes.md"), "w").write("foreign file\n")
+
+    def attempt(**kw):
+        with contextlib.redirect_stdout(io.StringIO()):
+            try:
+                build_pack.build(src, validate=False, **kw)
+                return None
+            except MapgenError as e:
+                return str(e)
+
+    has = lambda *p: os.path.exists(os.path.join(out, *p))  # noqa: E731
+    checks = []
+    err = attempt()
+    checks.append(("merge refuses data/ without .build_pack_owned", err is not None and "--adopt" in err
+                   and has("data", "old")))
+    err = attempt(adopt=True)
+    checks.append(("--adopt takes over (old data/ gone, notes.md kept)", err is None and not has("data", "old")
+                   and has("notes.md") and has(".build_pack_owned") and not has(".built_by_build_pack")
+                   and has("data", "slice", "function", "extra", "tick.mcfunction") and has("src", "project.json")))
+    open(os.path.join(out, "notes.md"), "a").write("edited\n")
+    err = attempt()
+    checks.append(("merge rebuild keeps a foreign file", err is None and has("notes.md") and
+                   "edited" in open(os.path.join(out, "notes.md")).read() and has("tests", "j_extra_tick.test.json")))
+    clash = os.path.join(src, "pack", "data", "__ns__", "function", "load.mcfunction")
+    open(clash, "w").write("say clash\n")
+    err = attempt()
+    checks.append(("pack_src overlay collision is an ERROR naming both paths", err is not None and
+                   "would override" in err and clash in err and os.path.join(out, "data", "slice", "function",
+                                                                             "load.mcfunction") in err))
+    os.remove(clash)
+    proj.update(output="../..")
+    inner = os.path.join(out, "data", "proj")
+    shutil.copytree(src, inner)
+    json.dump(proj, open(os.path.join(inner, "project.json"), "w", encoding="utf-8"), indent=2)
+    with contextlib.redirect_stdout(io.StringIO()):
+        try:
+            build_pack.build(inner, validate=False)
+            err = None
+        except MapgenError as e:
+            err = str(e)
+    checks.append(("merge refuses a project inside out/data", err is not None and "lies inside" in err))
+    shutil.rmtree(tmp, ignore_errors=True)
+    bad = 0
+    for name, ok in checks:
+        bad += not ok
+        print(f"[{'ok ' if ok else 'BAD'}] build     {name}")
+    return bad
+
+
 def main(argv):
     fast = "--fast" in argv
-    bad = 0
+    bad = build_checks()
     code, out = run([os.path.join(ROOT, "tools", "lint_datapack.py"), vanilla_pack(), "--quiet"])
     bad += code != 0
     print(f"[{'ok ' if code == 0 else 'BAD'}] lint      vanilla data (all files) expected PASS  | {out.strip().splitlines()[-1]}")

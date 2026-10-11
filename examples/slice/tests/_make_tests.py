@@ -151,4 +151,103 @@ w("f_gallery.test.json", {
         {"assert":"in slice:arena if block 0 64 4096 minecraft:smooth_stone"},
         {"assert_output": {"command": "execute if entity @e[type=minecraft:text_display,tag=slice.gallery]", "contains": "Count: 9"}},
     ]})
+TC = 'function slice:round/start_with {game:"team_clash",map:"duel_pit",preset:"default"}'
+STATE = lambda n: {"assert_score": {"target": "#state", "objective": "slice.round", "equals": n}}  # noqa: E731
+COUNT = lambda sel, n: {"assert_output": {"command": f"execute if entity @e[{sel}]", "contains": f"Count: {n}"}}  # noqa: E731
+HOOKS = ["scoreboard players set #time_up_calls slice.var 0", "scoreboard players set #results_calls slice.var 0",
+         "scoreboard players set #teardown_calls slice.var 0"]
+
+w("g_last_team.test.json", {
+    "description": "win condition last_team: FFA gets unique tids 1..n; one eliminated -> round goes on; the last two "
+                   "eliminated in the same tick -> both win (10 + 10 x 3 + 2). Then 2 teams via tid (4 stand-ins): "
+                   "a team with an eliminated member wins as a whole (10 + 10 x 4 + 2)",
+    "setup": stands(3),
+    "steps": [
+        {"assert": 'if data storage slice:registry games.team_clash'},
+        {"assert": 'unless data storage slice:registry by_count.n3[{value:{game:"team_clash"}}]'},
+        {"run": TC},
+        {"ticks": 4},
+        STATE(2),
+        COUNT("tag=t.p,scores={slice.tid=1}", 1), COUNT("tag=t.p,scores={slice.tid=2}", 1),
+        COUNT("tag=t.p,scores={slice.tid=3}", 1),
+        {"run": "execute as @e[tag=t.p,scores={slice.tid=1}] run function slice:round/eliminate"},
+        {"ticks": 1},
+        STATE(2),
+        {"run": "tag @e[tag=t.p,tag=slice.alive] add slice.out_next"},
+        {"ticks": 1},
+        STATE(0),
+        COUNT("tag=t.p,scores={slice.coins=42}", 2),
+        COUNT("tag=t.p,scores={slice.coins=2,slice.tid=1}", 1),
+        {"run": "kill @e[tag=t.p]"},
+        {"run": "scoreboard players reset * slice.coins"},
+    ] + [{"run": c} for c in stands(4)] + [
+        {"run": TC},
+        {"ticks": 4},
+        STATE(2),
+        {"run": "scoreboard players set @e[tag=t.p] slice.tid 2"},
+        {"run": "scoreboard players set @e[tag=t.p,limit=2] slice.tid 1"},
+        {"run": "execute as @e[tag=t.p,scores={slice.tid=1},limit=1] run function slice:round/eliminate"},
+        {"ticks": 1},
+        STATE(2),
+        {"run": "execute as @e[tag=t.p,scores={slice.tid=2}] run function slice:round/eliminate"},
+        {"ticks": 1},
+        STATE(0),
+        COUNT("tag=t.p,scores={slice.coins=52,slice.tid=1}", 2),
+        COUNT("tag=t.p,scores={slice.coins=2,slice.tid=2}", 2),
+    ],
+    "teardown": CLEAN})
+
+w("h_time_up_hook.test.json", {
+    "description": "rules.time_up \"hook\": when the timer runs out the time_up hook runs once and the round keeps "
+                   "running; round/end then runs the results hook (after payout) and the teardown hook",
+    "setup": stands(3) + HOOKS,
+    "steps": [
+        {"run": TC},
+        {"ticks": 4},
+        STATE(2),
+        {"assert_data": {"source": "storage slice:round", "path": "current.rules.time_up", "equals": '"hook"'}},
+        {"run": "scoreboard players set #global slice.rtimer 2"},
+        {"ticks": 3},
+        {"assert_score": {"target": "#time_up_calls", "objective": "slice.var", "equals": 1}},
+        STATE(2),
+        {"ticks": 3},
+        {"assert_score": {"target": "#time_up_calls", "objective": "slice.var", "equals": 1}},
+        {"assert_score": {"target": "#results_calls", "objective": "slice.var", "equals": 0}},
+        {"run": "function slice:round/end"},
+        STATE(0),
+        {"assert_score": {"target": "#results_calls", "objective": "slice.var", "equals": 1}},
+        {"assert_score": {"target": "#teardown_calls", "objective": "slice.var", "equals": 1}},
+        COUNT("tag=t.p,scores={slice.coins=42}", 3),
+    ],
+    "teardown": CLEAN})
+
+w("i_multiplier.test.json", {
+    "description": "#mult_pct (100 at start) scales the payout: 150 -> winner (10 + 10 x 3) x 1.5 = 60, "
+                   "participation 2 x 1.5 = 3, stored in last_payout",
+    "setup": stands(3),
+    "steps": [
+        {"run": TC},
+        {"ticks": 4},
+        STATE(2),
+        {"assert_score": {"target": "#mult_pct", "objective": "slice.round", "equals": 100}},
+        {"run": "scoreboard players set #mult_pct slice.round 150"},
+        {"run": "execute as @e[tag=t.p,scores={slice.tid=1..2}] run function slice:round/eliminate"},
+        {"ticks": 1},
+        STATE(0),
+        {"assert_data": {"source": "storage slice:round", "path": "last_payout.winner", "equals": "60"}},
+        {"assert_data": {"source": "storage slice:round", "path": "last_payout.participation", "equals": "3"}},
+        COUNT("tag=t.p,scores={slice.coins=63,slice.tid=3}", 1),
+        COUNT("tag=t.p,scores={slice.coins=3}", 2),
+    ],
+    "teardown": CLEAN})
+
+w("j_extra_tick.test.json", {
+    "description": "project.json functions: slice:extra/load (from the pack_src overlay) ran at load via "
+                   "#slice:extra_load; slice:extra/tick runs every tick via #slice:extra_tick",
+    "steps": [
+        {"assert_score": {"target": "#extra_load", "objective": "slice.var", "equals": 1}},
+        {"run": "scoreboard players set #extra_tick slice.var 0"},
+        {"ticks": 5},
+        {"assert_score": {"target": "#extra_tick", "objective": "slice.var", "equals": 5}},
+    ]})
 print("wrote tests")

@@ -14,6 +14,10 @@
     {
       "id": "block_brawl",
       "weight": 1
+    },
+    {
+      "id": "team_clash",
+      "weight": 0
     }
   ],
   "maps": [

@@ -1,0 +1,78 @@
+{
+  "description": "#mult_pct (100 at start) scales the payout: 150 -> winner (10 + 10 x 3) x 1.5 = 60, participation 2 x 1.5 = 3, stored in last_payout",
+  "setup": [
+    "summon minecraft:armor_stand 0 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 2 -60 2 {Tags:[\"t.p\"]}",
+    "summon minecraft:armor_stand 4 -60 2 {Tags:[\"t.p\"]}",
+    "execute as @e[tag=t.p] run function slice:queue/join"
+  ],
+  "steps": [
+    {
+      "run": "function slice:round/start_with {game:\"team_clash\",map:\"duel_pit\",preset:\"default\"}"
+    },
+    {
+      "ticks": 4
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 2
+      }
+    },
+    {
+      "assert_score": {
+        "target": "#mult_pct",
+        "objective": "slice.round",
+        "equals": 100
+      }
+    },
+    {
+      "run": "scoreboard players set #mult_pct slice.round 150"
+    },
+    {
+      "run": "execute as @e[tag=t.p,scores={slice.tid=1..2}] run function slice:round/eliminate"
+    },
+    {
+      "ticks": 1
+    },
+    {
+      "assert_score": {
+        "target": "#state",
+        "objective": "slice.round",
+        "equals": 0
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:round",
+        "path": "last_payout.winner",
+        "equals": "60"
+      }
+    },
+    {
+      "assert_data": {
+        "source": "storage slice:round",
+        "path": "last_payout.participation",
+        "equals": "3"
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=63,slice.tid=3}]",
+        "contains": "Count: 1"
+      }
+    },
+    {
+      "assert_output": {
+        "command": "execute if entity @e[tag=t.p,scores={slice.coins=3}]",
+        "contains": "Count: 2"
+      }
+    }
+  ],
+  "teardown": [
+    "kill @e[tag=t.p]",
+    "scoreboard players reset * slice.coins",
+    "tag @e remove slice.queued"
+  ]
+}

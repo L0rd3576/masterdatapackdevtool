@@ -1,10 +1,15 @@
 #> __ns__:payout/run - internal: award __ns__.__currency__ from the minigame's payout block (n = participants)
 #> linear: winners get base + per_participant*n; pot: that amount split evenly between winners; all get participation
+#> Both amounts are scaled by #mult_pct __ns__.round (percent, 100 = 1x; set to 100 at start, games may change it).
 execute store result score #base __ns__.var run data get storage __ns__:round current.game.payout.base
 execute store result score #amount __ns__.var run data get storage __ns__:round current.game.payout.per_participant
 execute store result score #part __ns__.var run data get storage __ns__:round current.game.payout.participation
 scoreboard players operation #amount __ns__.var *= #n __ns__.round
 scoreboard players operation #amount __ns__.var += #base __ns__.var
+scoreboard players operation #amount __ns__.var *= #mult_pct __ns__.round
+scoreboard players operation #amount __ns__.var /= #100 __ns__.var
+scoreboard players operation #part __ns__.var *= #mult_pct __ns__.round
+scoreboard players operation #part __ns__.var /= #100 __ns__.var
 execute if data storage __ns__:round current.game.payout{type:"pot"} run function __ns__:payout/_pot_split
 execute store result storage __ns__:round last_payout.winner int 1 run scoreboard players get #amount __ns__.var
 execute store result storage __ns__:round last_payout.participation int 1 run scoreboard players get #part __ns__.var

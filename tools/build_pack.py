@@ -2,13 +2,19 @@
 """Compile a framework project (project.json, minigames/, maps/, presets/, pool.json) into a 26.3 datapack.
 
 Usage:
-    python tools/build_pack.py <project-dir> [--out DIR] [--no-validate] [--plugin-dir DIR]
+    python tools/build_pack.py <project-dir> [--out DIR] [--no-validate] [--plugin-dir DIR] [--adopt]
 
 Steps: schema + cross-reference checks (tools/mapgen/project.py) -> generate/load every enabled pool map and
 run the offline map validators -> copy the framework (tools/framework/pack, placeholders __ns__/__lib__/...)
 -> vendor mcdp_lib -> write runtime data (storage <ns>:registry), map structure tiles, the arena dimension,
-minigame hook functions, gallery functions and tests. Afterwards run tools/lint_datapack.py and
-tools/run_tests.py on the output. Contract: knowledge/framework-contract.md.
+minigame hook functions, project load/tick tags (#<ns>:extra_load/extra_tick), gallery functions and tests
+-> copy the project's pack_src overlay last (a file the build already wrote is an error).
+Afterwards run tools/lint_datapack.py and tools/run_tests.py on the output. Contract: knowledge/framework-contract.md.
+
+project.json output_mode: "replace" (default) deletes and rewrites the whole output dir, but only one that
+build_pack created (marker .built_by_build_pack). "merge" rewrites only data/, tests/, pack.mcmeta and
+.build_pack_owned and keeps every other file (docs, the project dir itself). A merge output that has data/
+but no .build_pack_owned is refused unless --adopt is given (then its data/, tests/, pack.mcmeta are replaced).
 """
 import argparse
 import json
@@ -29,6 +35,8 @@ import structure_writer  # noqa: E402
 
 FRAMEWORK = os.path.join(HERE, "framework", "pack")
 MARKER = ".built_by_build_pack"
+OWNED = ".build_pack_owned"
+MERGE_OWNED = ("data", "tests", "pack.mcmeta", OWNED)
 SNBT_KEY = re.compile(r"^[A-Za-z0-9_.+-]+$")
 
 
@@ -122,7 +130,73 @@ def by_count(pr):
     return out
 
 
-def build(project_dir, out=None, validate=True, extra_dirs=()):
+def _inside(path, parent):
+    path, parent = os.path.normcase(os.path.abspath(path)), os.path.normcase(os.path.abspath(parent))
+    return path == parent or path.startswith(parent.rstrip(os.sep) + os.sep)
+
+
+def prepare_output(out, mode, adopt, keep_dirs):
+    """Empty the parts of `out` the build owns. keep_dirs: source dirs that must not lie in a deleted part."""
+    if mode == "replace":
+        # only ever delete a dir this tool created (and never one holding the project)
+        for d in keep_dirs:
+            if _inside(d, out):
+                raise core.MapgenError(f"{d} lies inside the output {out}, which a replace build deletes; "
+                                       "use output_mode \"merge\" or another output dir")
+        if os.path.exists(out):
+            if not os.path.isfile(os.path.join(out, MARKER)):
+                if os.listdir(out):
+                    raise core.MapgenError(f"{out} exists, is not empty and was not created by build_pack; refusing to delete")
+            shutil.rmtree(out)
+        return
+    for name in ("data", "tests"):
+        for d in keep_dirs:
+            if _inside(d, os.path.join(out, name)):
+                raise core.MapgenError(f"{d} lies inside {os.path.join(out, name)}, which a merge build deletes; "
+                                       "move the project (or its tests/pack_src dir) elsewhere")
+    if os.path.isdir(os.path.join(out, "data")) and not os.path.isfile(os.path.join(out, OWNED)) \
+            and not os.path.isfile(os.path.join(out, MARKER)) and not adopt:
+        raise core.MapgenError(f"{out} has data/ but no {OWNED} (not built by build_pack in merge mode); refusing to "
+                               "touch it. Pass --adopt to take it over: its data/, tests/ and pack.mcmeta are replaced")
+    for name in MERGE_OWNED + (MARKER,):
+        p = os.path.join(out, name)
+        if os.path.isdir(p):
+            shutil.rmtree(p)
+        elif os.path.exists(p):
+            os.remove(p)
+    write(os.path.join(out, OWNED), "Merge build by tools/build_pack.py: data/, tests/, pack.mcmeta and this file are "
+                                    "deleted and rewritten on every build. Other files here are left alone.\n")
+
+
+def overlay(out, src_dir, tokens):
+    """Copy the pack_src tree over the built pack; tokens are replaced in paths and .mcfunction/.json text."""
+    todo, clash = [], []
+    for dp, _, fns in os.walk(src_dir):
+        for fn in sorted(fns):
+            src = os.path.join(dp, fn)
+            rel = os.path.relpath(src, src_dir)
+            for k, v in tokens.items():
+                rel = rel.replace(k, v)
+            dest = os.path.join(out, rel)
+            if os.path.exists(dest):
+                clash.append(f"   {src}\n      would override {dest}")
+            todo.append((src, dest))
+    if clash:
+        raise core.MapgenError("pack_src overlay collides with files the build wrote (rename or remove them; "
+                               "framework files are never overridden):\n" + "\n".join(clash))
+    for src, dest in todo:
+        if dest.endswith((".mcfunction", ".json")):
+            text = open(src, encoding="utf-8").read()
+            for k, v in tokens.items():
+                text = text.replace(k, v)
+            write(dest, text)
+        else:
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            shutil.copyfile(src, dest)
+    return len(todo)
+
+
+def build(project_dir, out=None, validate=True, extra_dirs=(), adopt=False):
     cfg = core.load_config()
     pr = projmod.load_project(project_dir)
     for i in pr.issues:
@@ -134,6 +208,10 @@ def build(project_dir, out=None, validate=True, extra_dirs=()):
     if ns in ("minecraft", lib):
         raise core.MapgenError(f"namespace {ns!r} clashes with minecraft or the library prefix")
     out = os.path.abspath(out or os.path.join(pr.dir, P["output"]))
+    tests = os.path.join(pr.dir, P["tests"])
+    pack_src = os.path.join(pr.dir, P["pack_src"]) if P.get("pack_src") else None
+    if pack_src and not os.path.isdir(pack_src):
+        raise core.MapgenError(f"pack_src dir {pack_src} not found")
 
     # maps: generate + validate (offline validators; the server check is the pack's own test run)
     pool_maps = [e["id"] for e in pr.pool["maps"] if e["enabled"]]
@@ -156,12 +234,9 @@ def build(project_dir, out=None, validate=True, extra_dirs=()):
     if failed:
         raise core.MapgenError("map validation failed; nothing built (use --no-validate to force)")
 
-    # output dir (only ever delete a dir this tool created)
-    if os.path.exists(out):
-        if not os.path.isfile(os.path.join(out, MARKER)):
-            if os.listdir(out):
-                raise core.MapgenError(f"{out} exists, is not empty and was not created by build_pack; refusing to delete")
-        shutil.rmtree(out)
+    # output dir: replace = whole dir, merge = only data/, tests/, pack.mcmeta (see the docstring)
+    mode = P["output_mode"]
+    prepare_output(out, mode, adopt, [pr.dir, tests] + ([pack_src] if pack_src else []))
     tokens = {"__ns__": ns, "__lib__": lib, "__arena__": P["arena"]["dimension"],
               "__currency__": P["currency"]["objective"], "__currency_name__": P["currency"]["display_name"]}
     for dp, _, fns in os.walk(FRAMEWORK):
@@ -174,7 +249,8 @@ def build(project_dir, out=None, validate=True, extra_dirs=()):
             for k, v in tokens.items():
                 text = text.replace(k, v)
             write(os.path.join(out, rel), text)
-    write(os.path.join(out, MARKER), "This directory is generated by tools/build_pack.py and deleted on rebuild.\n")
+    if mode == "replace":
+        write(os.path.join(out, MARKER), "This directory is generated by tools/build_pack.py and deleted on rebuild.\n")
     write(os.path.join(out, "pack.mcmeta"), json.dumps(
         {"pack": {"description": P["description"], "min_format": 121, "max_format": 121}}, indent=2) + "\n")
     new_project.vendor(out, lib)
@@ -241,14 +317,24 @@ def build(project_dir, out=None, validate=True, extra_dirs=()):
         hl.append(f"function {ns}:game/{gid}/load")
     write(os.path.join(data, "function", "_gen", "hooks_load.mcfunction"), "\n".join(hl) + "\n")
 
+    # project load/tick functions: framework load ends with function #<ns>:extra_load, tick starts with extra_tick
+    for kind in ("load", "tick"):
+        write(os.path.join(data, "tags", "function", f"extra_{kind}.json"),
+              json.dumps({"values": P["functions"][kind]}, indent=2) + "\n")
+
     if P["gallery"]:
         gallery.write_functions(out, ns, P, maps, cfg)
 
-    tests = os.path.join(pr.dir, P["tests"])
     if os.path.isdir(tests):
         shutil.copytree(tests, os.path.join(out, "tests"))
-    print(f"built {out}: {len(games)} minigame(s), {len(maps)} map(s), "
-          f"{sum(len(m['tiles']) for m in maps.values())} structure tile(s), {tpt} tile(s)/tick")
+    n_overlay = overlay(out, pack_src, {"__ns__": ns, "__lib__": lib}) if pack_src else 0
+    missing = [f for kind in ("load", "tick") for f in P["functions"][kind]
+               if not os.path.isfile(os.path.join(out, "data", f.split(":")[0], "function", f.split(":")[1] + ".mcfunction"))]
+    if missing:
+        raise core.MapgenError(f"project.json functions not found in the built pack: {', '.join(missing)}")
+    print(f"built {out} ({mode}): {len(games)} minigame(s), {len(maps)} map(s), "
+          f"{sum(len(m['tiles']) for m in maps.values())} structure tile(s), {tpt} tile(s)/tick, "
+          f"{n_overlay} pack_src file(s)")
     return out
 
 
@@ -258,9 +344,11 @@ def main():
     ap.add_argument("--out")
     ap.add_argument("--no-validate", action="store_true")
     ap.add_argument("--plugin-dir", action="append", default=[])
+    ap.add_argument("--adopt", action="store_true",
+                    help="merge mode: take over an output dir with data/ but no .build_pack_owned")
     args = ap.parse_args()
     try:
-        out = build(args.project, args.out, not args.no_validate, args.plugin_dir)
+        out = build(args.project, args.out, not args.no_validate, args.plugin_dir, args.adopt)
     except core.MapgenError as e:
         print(f"FAIL: {e}")
         return 1

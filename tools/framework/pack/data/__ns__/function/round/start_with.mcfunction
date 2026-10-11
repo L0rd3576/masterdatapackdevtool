@@ -17,6 +17,9 @@ execute store result storage __ns__:round current.participants int 1 run scorebo
 tag @e[tag=__ns__.queued] add __ns__.in_round
 tag @e[tag=__ns__.queued] add __ns__.alive
 tag @e[tag=__ns__.queued] remove __ns__.queued
+scoreboard players set #tid __ns__.var 0
+execute as @e[tag=__ns__.in_round] run function __ns__:round/_tid
+scoreboard players set #mult_pct __ns__.round 100
 scoreboard players set @e[tag=__ns__.in_round] __ns__.score 0
 scoreboard players set @e[tag=__ns__.in_round] __ns__.deaths 0
 scoreboard players set #state __ns__.round 1

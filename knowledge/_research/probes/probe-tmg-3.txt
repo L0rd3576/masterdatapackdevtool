@@ -1,0 +1,15 @@
+> function zp:call_empty
+  Running function zp:call_empty   [9 ms]
+  | [18:18:47] [Server thread/INFO]: [Not Secure] [Rcon] empty_tag_ok
+> forceload add 0 0 16 16
+  No chunks were marked for force loading   [1 ms]
+> fill 0 64 0 8 65 8 minecraft:stone
+  Successfully filled 162 block(s)   [13 ms]
+> fill 0 70 0 8 70 8 minecraft:stone
+... (setup lines elided: fill, scoreboard set; sweep {R:4} at y65 mode 2 = lava, at y70 mode 1 = air; r2=4, Rb2=16)
+> @ticks 60
+> fill 0 66 0 8 66 8 minecraft:glass replace minecraft:lava      -> No blocks were filled   (no lava above)
+> fill 0 64 0 8 64 8 minecraft:glass replace minecraft:lava      -> No blocks were filled   (no lava below)
+> fill 0 65 0 8 65 8 minecraft:magma_block replace minecraft:lava -> Successfully filled 36 block(s)  (4 < d2 <= 16)
+> fill 0 65 0 8 65 8 minecraft:glass replace minecraft:stone      -> Successfully filled 45 block(s)
+> fill 0 70 0 8 70 8 minecraft:glass replace minecraft:stone      -> Successfully filled 45 block(s)

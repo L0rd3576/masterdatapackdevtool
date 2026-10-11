@@ -32,7 +32,7 @@
     "win_condition": {
       "type": "string",
       "pattern": "^[a-z0-9_]+$",
-      "description": "Id of a framework win condition (a folder tools/framework/pack/data/__ns__/function/win/<id>/): last_standing, highest_score, survive."
+      "description": "Id of a framework win condition (a folder tools/framework/pack/data/__ns__/function/win/<id>/): last_standing, last_team, highest_score, survive."
     },
     "payout": {"$ref": "#/definitions/payout"},
     "functions": {
@@ -44,7 +44,10 @@
         "player_start": {"type": "string", "description": "As/at each participant when the round starts."},
         "tick": {"type": "string", "description": "Every tick while the round runs."},
         "eliminated": {"type": "string", "description": "As a participant when it is eliminated."},
-        "end": {"type": "string", "description": "Once when the round ends, before payout and teardown."}
+        "time_up": {"type": "string", "description": "Once when the time limit runs out and rules.time_up is \"hook\" (the round keeps running)."},
+        "end": {"type": "string", "description": "Once when the round ends, before payout and teardown."},
+        "results": {"type": "string", "description": "Once after payout and the winner message (last_payout is set)."},
+        "teardown": {"type": "string", "description": "Once at teardown, after rules are reverted and participants restored (in_round tags still set)."}
       },
       "additionalProperties": false,
       "default": {}
@@ -64,6 +67,8 @@
         "natural_regeneration": {"type": "boolean", "default": true},
         "fall_damage": {"type": "boolean", "default": true},
         "time_limit_seconds": {"type": "integer", "minimum": 0, "default": 180, "description": "0 = no time limit."},
+        "time_up": {"type": "string", "enum": ["end", "hook"], "default": "end",
+                    "description": "When the time limit runs out: end the round, or run the time_up hook and keep running."},
         "respawn": {"type": "string", "enum": ["eliminate", "respawn"], "default": "eliminate",
                     "description": "On death: eliminate (spectator until the round ends) or respawn at a map spawn."},
         "gamemode": {"type": "string", "enum": ["auto", "adventure", "survival", "creative", "spectator"], "default": "auto",

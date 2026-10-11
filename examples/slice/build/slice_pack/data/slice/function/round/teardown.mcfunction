@@ -3,6 +3,7 @@ function mcdp_lib:rules/revert
 execute as @a[tag=slice.in_round] run function mcdp_lib:player/restore_inventory
 execute as @a[tag=slice.in_round] run function mcdp_lib:player/restore_gamemode
 execute as @e[tag=slice.in_round] run function mcdp_lib:player/restore_position
+function slice:round/hook {hook:"teardown"}
 scoreboard players reset @e[tag=slice.in_round] slice.score
 tag @e remove slice.alive
 tag @e remove slice.in_round

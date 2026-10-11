@@ -1,0 +1,65 @@
+# tmg planning probe 1: stand-in mechanics (attacker, HurtTime, attributes, health, teams, lava, scoreboard display)
+summon minecraft:pig 0 -60 0 {NoAI:1b,Tags:["v"]}
+summon minecraft:pig 3 -60 0 {NoAI:1b,Tags:["a"]}
+summon minecraft:armor_stand 6 -60 0 {Tags:["s"]}
+execute as @e[tag=v] on attacker run say before
+damage @e[tag=v,limit=1] 1 minecraft:mob_attack by @e[tag=a,limit=1]
+data get entity @e[tag=v,limit=1] HurtTime
+execute as @e[tag=v] on attacker if entity @s[tag=a] run say attacker_found
+data get entity @e[tag=v,limit=1] Health
+@ticks 1
+data get entity @e[tag=v,limit=1] HurtTime
+@ticks 9
+data get entity @e[tag=v,limit=1] HurtTime
+@ticks 100
+execute as @e[tag=v] on attacker run say still_after_110
+damage @e[tag=s,limit=1] 1 minecraft:mob_attack by @e[tag=a,limit=1]
+execute as @e[tag=s] on attacker run say stand_attacker
+data get entity @e[tag=s,limit=1] HurtTime
+attribute @e[tag=s,limit=1] minecraft:movement_speed get
+attribute @e[tag=s,limit=1] minecraft:jump_strength get
+attribute @e[tag=s,limit=1] minecraft:entity_interaction_range get
+attribute @e[tag=s,limit=1] minecraft:movement_speed modifier add tmg:freeze -1 add_multiplied_total
+attribute @e[tag=s,limit=1] minecraft:movement_speed get
+attribute @e[tag=s,limit=1] minecraft:movement_speed modifier remove tmg:freeze
+attribute @e[tag=s,limit=1] minecraft:movement_speed get
+attribute @e[tag=v,limit=1] minecraft:max_health get
+attribute @e[tag=v,limit=1] minecraft:max_health modifier add tmg:hp 20 add_value
+attribute @e[tag=v,limit=1] minecraft:max_health get
+data get entity @e[tag=v,limit=1] Health
+effect give @e[tag=v,limit=1] minecraft:instant_health 1 5 true
+@ticks 1
+data get entity @e[tag=v,limit=1] Health
+attribute @e[tag=v,limit=1] minecraft:max_health modifier remove tmg:hp
+@ticks 1
+data get entity @e[tag=v,limit=1] Health
+attribute @e[tag=s,limit=1] minecraft:max_health modifier add tmg:hp 10 add_value
+effect give @e[tag=s,limit=1] minecraft:instant_health 1 5 true
+@ticks 1
+data get entity @e[tag=s,limit=1] Health
+team add tmg.t1 {text:"Red"}
+team modify tmg.t1 friendlyFire false
+team modify tmg.t1 color red
+team join tmg.t1 @e[tag=v]
+team join tmg.t1 @e[tag=a]
+damage @e[tag=v,limit=1] 1 minecraft:mob_attack by @e[tag=a,limit=1]
+data get entity @e[tag=v,limit=1] Health
+setblock 0 -60 5 minecraft:lava
+summon minecraft:armor_stand 0 -60 5 {Tags:["l"]}
+execute as @e[tag=l] at @s if block ~ ~ ~ minecraft:lava run say in_lava
+execute as @e[tag=l] at @s if block ~ ~ ~ #minecraft:lava run say in_lava_tag
+scoreboard objectives add tmg.money dummy {text:"Money"}
+scoreboard objectives add tmg.leave minecraft.custom:minecraft.leave_game
+scoreboard objectives add tmg.optout trigger
+scoreboard objectives setdisplay list tmg.money
+scoreboard players set #x tmg.money 750
+scoreboard players display numberformat #x tmg.money fixed {text:"$7.50",color:"gold"}
+scoreboard objectives modify tmg.money numberformat styled {color:"gold"}
+item replace entity @e[tag=s,limit=1] weapon.mainhand with minecraft:stick[enchantments={"minecraft:knockback":4}]
+data get entity @e[tag=s,limit=1] equipment.mainhand
+item replace entity @e[tag=s,limit=1] weapon.mainhand with minecraft:stick[enchantments={"minecraft:knockback":0}]
+time query gametime
+execute store result score #t tmg.money run time query gametime
+scoreboard players get #t tmg.money
+gamerule immediate_respawn
+gamerule pvp

@@ -58,3 +58,9 @@ BAD (server message):
 - Common: custom_data, custom_name, item_name, lore, rarity, unbreakable, damage, max_damage, max_stack_size,
   enchantments, stored_enchantments, enchantment_glint_override, attribute_modifiers, tooltip_display, item_model,
   consumable, food, equippable, use_cooldown, potion_contents, dyed_color, profile, tool, weapon.
+
+## Enchantment levels on any item (probe 2026-10-10)
+- [V] `minecraft:stick[enchantments={"minecraft:knockback":4}]` is stored as-is (`data get` shows level 4); level 0 is rejected
+  (`Value 0 outside of range [1:255]`). Vanilla `enchantment/knockback.json`: effect `minecraft:knockback` add linear
+  base 1 per level, slot `mainhand`, no tool condition (`supported_items` only gates enchanting/anvils), `max_level` 2
+  (survival cap only). In-game knockback of a stick needs a real player (unverified).
