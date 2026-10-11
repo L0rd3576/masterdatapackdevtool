@@ -13,3 +13,4 @@ __pycache__/
 *.log
 chain-status.json
 chain-logs/
+gm-chain-status.json
