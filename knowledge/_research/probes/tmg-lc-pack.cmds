@@ -1,0 +1,24 @@
+# Probe 2026-10-11: left-click detection (piercing_weapon + post_piercing_attack enchantment). Pack: tmg-lc-pack
+summon minecraft:armor_stand 0 -60 0 {Tags:["s"],NoGravity:1b}
+# 1 old-pack form (piercing_weapon with reach fields) + enchantment from the pack
+item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[custom_data={lc:1b},piercing_weapon={min_reach:0.0,max_reach:0.0,hitbox_margin:0.0},enchantments={"lc:left_click":1}] 1
+data get entity @n[tag=s] equipment.mainhand
+# 2 minimal piercing_weapon
+item replace entity @n[tag=s] weapon.offhand with minecraft:redstone_torch[piercing_weapon={},enchantments={"lc:left_click":1}] 1
+data get entity @n[tag=s] equipment.offhand
+# 3 attack_range component (26.x), plus piercing_weapon
+item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[piercing_weapon={},attack_range={min_reach:0.0,max_reach:0.0,hitbox_margin:0.0},enchantments={"lc:left_click":1}] 1
+data get entity @n[tag=s] equipment.mainhand
+# 4 attack_range fields (error text lists valid fields)
+item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[attack_range={bogus:1}] 1
+# 5 does the enchantment exist and is it registered
+data get entity @n[tag=s] equipment.mainhand.components
+# 6 vanilla spear piercing_weapon fields
+item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[piercing_weapon={bogus:1}] 1
+# 7 attack speed modifier as cooldown (old pack form)
+item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[piercing_weapon={},enchantments={"lc:left_click":1},attribute_modifiers=[{id:"attack_speed",type:"attack_speed",amount:-1.4,operation:"add_value",slot:"hand",display:{type:"hidden"}}]] 1
+data get entity @n[tag=s] equipment.mainhand.components
+# 8 enchantment registry check via a give-free test: item with a nonexistent enchantment
+item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[enchantments={"lc:nope":1}] 1
+# 9 execute as armor stand the function (shows function itself runs)
+execute as @n[tag=s] run function lc:on_left

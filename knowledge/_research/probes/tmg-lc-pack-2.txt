@@ -1,0 +1,10 @@
+> summon minecraft:interaction 0 -60 0 {width:1.0f,height:1.0f,response:1b,Tags:["i"]}
+  Summoned new Interaction   [17 ms]
+> data get entity @n[type=minecraft:interaction] attack
+  Found no elements matching attack   [6 ms]
+> data get entity @n[type=minecraft:interaction] interaction
+  Found no elements matching interaction   [1 ms]
+> data get entity @n[type=minecraft:interaction] response
+  Interaction has the following entity data: 1b   [3 ms]
+> advancement revoke @a only lc:hit
+  No player was found   [1 ms]

@@ -1,0 +1,29 @@
+> summon minecraft:armor_stand 0 -60 0 {Tags:["s"],NoGravity:1b}
+  Summoned new Armor Stand   [21 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[custom_data={lc:1b},piercing_weapon={min_reach:0.0,max_reach:0.0,hitbox_margin:0.0},enchantments={"lc:left_click":1}] 1
+  Replaced 1 slot(s) on Armor Stand with [Redstone Torch]   [14 ms]
+> data get entity @n[tag=s] equipment.mainhand
+  Armor Stand has the following entity data: {components: {"minecraft:enchantments": {"lc:left_click": 1}, "minecraft:custom_data": {lc: 1b}, "minecraft:piercing_weapon": {}}, count: 1, id: "minecraft:redstone_torch"}   [8 ms]
+> item replace entity @n[tag=s] weapon.offhand with minecraft:redstone_torch[piercing_weapon={},enchantments={"lc:left_click":1}] 1
+  Replaced 1 slot(s) on Armor Stand with [Redstone Torch]   [1 ms]
+> data get entity @n[tag=s] equipment.offhand
+  Armor Stand has the following entity data: {components: {"minecraft:enchantments": {"lc:left_click": 1}, "minecraft:piercing_weapon": {}}, count: 1, id: "minecraft:redstone_torch"}   [2 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[piercing_weapon={},attack_range={min_reach:0.0,max_reach:0.0,hitbox_margin:0.0},enchantments={"lc:left_click":1}] 1
+  Replaced 1 slot(s) on Armor Stand with [Redstone Torch]   [2 ms]
+> data get entity @n[tag=s] equipment.mainhand
+  Armor Stand has the following entity data: {components: {"minecraft:attack_range": {max_reach: 0.0f, hitbox_margin: 0.0f}, "minecraft:enchantments": {"lc:left_click": 1}, "minecraft:piercing_weapon": {}}, count: 1, id: "minecraft:redstone_torch"}   [2 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[attack_range={bogus:1}] 1
+  Replaced 1 slot(s) on Armor Stand with [Redstone Torch]   [1 ms]
+> data get entity @n[tag=s] equipment.mainhand.components
+  Armor Stand has the following entity data: {"minecraft:attack_range": {}}   [1 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[piercing_weapon={bogus:1}] 1
+  Replaced 1 slot(s) on Armor Stand with [Redstone Torch]   [1 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[piercing_weapon={},enchantments={"lc:left_click":1},attribute_modifiers=[{id:"attack_speed",type:"attack_speed",amount:-1.4,operation:"add_value",slot:"hand",display:{type:"hidden"}}]] 1
+  Replaced 1 slot(s) on Armor Stand with [Redstone Torch]   [2 ms]
+> data get entity @n[tag=s] equipment.mainhand.components
+  Armor Stand has the following entity data: {"minecraft:attribute_modifiers": [{amount: -1.4d, display: {type: "hidden"}, id: "minecraft:attack_speed", slot: "hand", type: "minecraft:attack_speed", operation: "add_value"}], "minecraft:enchantments": {"lc:left_click": 1}, "minecraft:piercing_weapon": {}}   [2 ms]
+> item replace entity @n[tag=s] weapon.mainhand with minecraft:redstone_torch[enchantments={"lc:nope":1}] 1
+  Malformed 'minecraft:enchantments' component: 'Failed to get element lc:nope from registry minecraft:enchantment missed input: {"lc:nope":1}'...hantments={"lc:nope":1}] 1<--[HERE]   [2 ms]
+> execute as @n[tag=s] run function lc:on_left
+  Running function lc:on_left   [9 ms]
+  | [15:24:47] [Server thread/INFO]: [Not Secure] [Armor Stand] LEFT

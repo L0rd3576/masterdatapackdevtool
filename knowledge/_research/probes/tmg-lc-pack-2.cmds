@@ -1,0 +1,6 @@
+# Probe 2026-10-11 (2): interaction entity attack data, player_hurt_entity advancement load. Pack: tmg-lc-pack
+summon minecraft:interaction 0 -60 0 {width:1.0f,height:1.0f,response:1b,Tags:["i"]}
+data get entity @n[type=minecraft:interaction] attack
+data get entity @n[type=minecraft:interaction] interaction
+data get entity @n[type=minecraft:interaction] response
+advancement revoke @a only lc:hit

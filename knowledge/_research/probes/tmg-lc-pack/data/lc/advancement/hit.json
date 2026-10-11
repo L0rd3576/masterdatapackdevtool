@@ -1,0 +1,17 @@
+{
+  "criteria": {
+    "hit": {
+      "trigger": "minecraft:player_hurt_entity",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "slots": {"weapon.mainhand": {"predicates": {"minecraft:custom_data": {"lc": 1}}}}
+          }
+        }
+      }
+    }
+  },
+  "rewards": {"function": "lc:on_left"}
+}

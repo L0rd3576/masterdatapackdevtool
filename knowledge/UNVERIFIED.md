@@ -47,3 +47,6 @@ one, verify it (copy a vanilla file, add a corpus line to `tools/corpus/commands
   `movement_speed`/`jump_strength` x0 freezes a player; knockback-enchanted stick knocks players back (levels 1-4);
   `execute in <dim> run spawnpoint` sets a respawn in a custom dimension; HurtTime=10 visible for player-vs-player hits;
   `gamemode spectator` on a dead player sticks through respawn; `leave_game` counts once per disconnect.
+
+- (2026-10-11, needs a real player) Left click with a zero-reach `piercing_weapon` + `attack_range` item: does `minecraft:post_piercing_attack` fire in the air, how fast can it repeat, does the `attack_speed` modifier cooldown apply, is anything damaged, behaviour in creative/spectator/offhand. Loading and item storage are verified (`_research/probes/tmg-lc-pack.txt`). Skill: `.claude/skills/left-click-detection`.
+- (2026-10-11, needs a real player) Interaction entity `attack` data fields (`player`, `timestamp`) are from the user's older pack; absence before a click and `response:1b` are verified.

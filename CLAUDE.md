@@ -91,6 +91,6 @@ This is how you get better over time; nothing is retrained, so the learning live
 - `schemas/` JSON schemas for every manifest + `tools/mapgen/config.json`; `examples/slice/` working framework project
 - `tools/mapgen/` generators/ + validators/ are plugins (add a file, never edit core); generators: `static_arena`,
   `room_grid`, `heightmap_terrain`, `circle_arena` (round disk, lava ring, wall ring); `tools/framework/pack/` round logic
-- `.claude/skills/` skills learned over time (map-authoring, minigame-manifest, generator-plugin are in
+- `.claude/skills/` skills learned over time (`right-click-detection`, `left-click-detection`: click input recipes, verified on 26.3) (map-authoring, minigame-manifest, generator-plugin are in
   `install/skills/` until copied, see `install/README.md`); `template-datapack/` valid starter pack with a test
 - `claude-code-prompt.md` the bootstrap prompt that built all of the above
